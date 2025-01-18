@@ -2,7 +2,7 @@
 import React, {useState} from "react";
 import CustomButton from "~/components/ui/Button";
 import {Option} from "~/types/options";
-import {companyTypes} from "~/components/pages/CreateCompany/constants/dropdownItems";
+import {companyTypes} from "~/routes/signup.company/constants/dropdownItems";
 import CustomDropdown from "~/components/ui/Dropdown";
 
 type Props = {

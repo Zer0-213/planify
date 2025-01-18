@@ -1,6 +1,6 @@
 ﻿import {createCompany} from "~/services/api/company";
 import {redirect, replace, useNavigation} from "react-router";
-import CreateCompany from "~/components/pages/CreateCompany";
+import CreateCompany from "~/routes/signup.company/components/formPage";
 import {getUserData} from "~/services/api/user";
 import {authToken, checkAuthCookie} from "~/utils/cookies";
 
