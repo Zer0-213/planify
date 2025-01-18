@@ -1,4 +1,5 @@
 ﻿using WebApplication1.Authentication.Models;
+using WebApplication1.Common.Exceptions;
 using WebApplication1.Data;
 using WebApplication1.User;
 using static System.Console;
@@ -36,24 +37,28 @@ public class AuthenticationRepository(AppDbContext dbContext) : IAuthenticationR
     }
 
 
-    public CreateAccountResult CreateAccount(UserModel user)
+    public SessionModel CreateAccount(UserModel user)
     {
-        try
-        {
             var existingUser = dbContext.Users.FirstOrDefault(u => u.Email == user.Email);
-            if (existingUser != null) return CreateAccountResult.UserAlreadyExists;
+            if (existingUser != null) throw new UserAlreadyExistsException(user.Email);
 
             user.PasswordHashed = HashString(user.PasswordHashed);
             dbContext.Users.Add(user);
             dbContext.SaveChanges();
 
-            return CreateAccountResult.Success;
-        }
-        catch (Exception e)
-        {
-            WriteLine(e);
-            return CreateAccountResult.Failure; // Handle unexpected errors
-        }
+           var token = Guid.NewGuid().ToString();
+            var session = new SessionModel
+            {
+                UserId = user.Id,
+                TokenHash = HashString(token),
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            };
+
+            dbContext.Sessions.Add(session);
+            dbContext.SaveChanges();
+
+            return session;
+        
     }
 
     private static bool VerifyPassword(string plainPassword, string hashedPassword)

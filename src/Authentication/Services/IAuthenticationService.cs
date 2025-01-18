@@ -6,5 +6,5 @@ namespace WebApplication1.Authentication.Services;
 public interface IAuthenticationService
 {
     Response<SessionDto> AuthenticateCredentials(string email, string password);
-    Response<RegisterDto> RegisterUser(RegisterDto registerDto);
+    Response<SessionDto> RegisterUser(RegisterDto registerDto);
 }

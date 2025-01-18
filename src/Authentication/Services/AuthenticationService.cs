@@ -1,4 +1,5 @@
 ﻿using WebApplication1.Authentication.DTOs;
+using WebApplication1.Authentication.Models;
 using WebApplication1.Authentication.Repositories;
 using WebApplication1.Common.DTOs;
 using WebApplication1.User;
@@ -25,7 +26,7 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
         };
     }
 
-    public Response<RegisterDto> RegisterUser(RegisterDto registerDto)
+    public Response<SessionDto> RegisterUser(RegisterDto registerDto)
     {
         var result = authRepo.CreateAccount(new UserModel
         {
@@ -36,29 +37,15 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
             DateOfBirth = registerDto.DateOfBirth
         });
 
-        return result switch
+        return new Response<SessionDto>
         {
-            CreateAccountResult.Failure => new Response<RegisterDto>
+            Success = true,
+            Data = new SessionDto
             {
-                Success = false,
-                Error = new ErrorDto
-                {
-                    Code = 500,
-                    Message = "Internal Server Error",
-                    Description = "An error occurred while creating the account"
-                }
-            },
-            CreateAccountResult.UserAlreadyExists => new Response<RegisterDto>
-            {
-                Success = false,
-                Error = new ErrorDto
-                {
-                    Code = 409,
-                    Message = "Conflict",
-                    Description = "A user with the provided email already exists"
-                }
-            },
-            _ => new Response<RegisterDto> { Success = true, Data = registerDto }
+                Id = result.Id,
+                Token = result.TokenHash,
+                ExpiresAt = result.ExpiresAt
+            }
         };
     }
 }

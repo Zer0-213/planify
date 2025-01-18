@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Authentication.DTOs;
 using WebApplication1.Authentication.Services;
 using WebApplication1.Common.DTOs;
+using WebApplication1.Common.Exceptions;
 using WebApplication1.Utils.Middleware;
 
 namespace WebApplication1.Authentication.Controllers;
@@ -63,6 +64,38 @@ public class AuthenticationController(IAuthenticationService authService) : Cont
     [HttpPost("register")]
     public ActionResult<Response<RegisterDto>> CreateAccount(RegisterDto registerDto)
     {
-        return authService.RegisterUser(registerDto);
+        try
+        {
+            return Ok(authService.RegisterUser(registerDto));
+        }
+        catch (UserAlreadyExistsException e)
+        {
+            return Conflict(
+                new Response<RegisterDto>
+                {
+                    Success = false,
+                    Error = new ErrorDto
+                    {
+                        Code = 409,
+                        Message = "Conflict",
+                        Description = e.Message
+                    }
+                }
+            );
+        }
+        catch (Exception e)
+        {
+            Console.Write(e.Message);
+            return StatusCode(502, new Response<RegisterDto>
+            {
+                Success = false,
+                Error = new ErrorDto
+                {
+                    Code = 502,
+                    Message = "Bad Gateway",
+                    Description = "An error occurred while processing your request"
+                }
+            });
+        }
     }
 }

@@ -22,7 +22,7 @@ export const loader = async ({request}: { request: Request }) => {
             throw new Error(user.error?.message || "Internal server error");
         }
 
-        return redirect(user?.data?.companyId ? "/dashboard" : "/create-company");
+        return redirect(user?.data?.companyId ? "/dashboard" : "/signup/company");
     } catch (e) {
         console.error("Loader error:", e);
         return redirect("/error");
