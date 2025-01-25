@@ -57,7 +57,12 @@ public class AuthenticationRepository(AppDbContext dbContext) : IAuthenticationR
             dbContext.Sessions.Add(session);
             dbContext.SaveChanges();
 
-            return session;
+            return new SessionModel
+            {
+                Id = session.Id,
+                TokenHash = token,
+                ExpiresAt = session.ExpiresAt
+            };
         
     }
 
