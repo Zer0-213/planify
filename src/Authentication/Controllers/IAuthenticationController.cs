@@ -7,7 +7,7 @@ namespace WebApplication1.Authentication.Controllers;
 
 public interface IAuthenticationController
 {
-    ActionResult<Response<SessionDto>> Login(LoginRequest request);
+    ActionResult<SessionDto> Login(LoginRequest request);
     ActionResult Logout();
-    ActionResult<Response<RegisterDto>> CreateAccount(RegisterDto registerDto);
+    ActionResult<RegisterDto> CreateAccount(RegisterDto registerDto);
 }

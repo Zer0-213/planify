@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using WebApplication1.Common.DTOs;
 using WebApplication1.Data;
-using WebApplication1.Utils.ResponseObjects;
 
 namespace WebApplication1.Utils.Middleware;
 
@@ -16,9 +15,8 @@ public class UserAuthFilter(AppDbContext dbContext, bool checkCompanyId = true) 
 
         if (!httpContext.Request.Headers.TryGetValue("Authorization", out var sessionData))
         {
-            context.Result = new JsonResult(new Response<UnauthorizedResponse>
+            context.Result = new JsonResult(new ErrResponse
             {
-                Success = false,
                 Error = new ErrorDto
                 {
                     Code = 401,
@@ -36,9 +34,8 @@ public class UserAuthFilter(AppDbContext dbContext, bool checkCompanyId = true) 
         var session = sessions.FirstOrDefault(s => VerifyHash(sessionData.ToString(), s.TokenHash));
         if (session == null || session.ExpiresAt <= DateTime.UtcNow)
         {
-            context.Result = new JsonResult(new Response<UnauthorizedResponse>
+            context.Result = new JsonResult(new ErrResponse
             {
-                Success = false,
                 Error = new ErrorDto
                 {
                     Code = 401,
@@ -56,9 +53,8 @@ public class UserAuthFilter(AppDbContext dbContext, bool checkCompanyId = true) 
 
         if (checkCompanyId && user?.CompanyId == null)
         {
-            context.Result = new JsonResult(new Response<UnauthorizedResponse>
+            context.Result = new JsonResult(new ErrResponse
             {
-                Success = false,
                 Error = new ErrorDto
                 {
                     Code = 401,

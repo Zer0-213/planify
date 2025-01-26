@@ -6,5 +6,5 @@ namespace WebApplication1.Company.Controllers;
 
 public interface ICompanyController
 {
-    ActionResult<Response<string>> CreateCompany(CreateCompanyDto createCompany);
+    ActionResult<ErrResponse> CreateCompany(CreateCompanyDto createCompany);
 }

@@ -1,35 +1,21 @@
 "use server"
 
-import {LoginDTO, LoginResponseDTO} from "@/src/actions/auth/auth/dtos/loginDTOs";
 import {redirect} from "next/navigation";
 import {cookies} from "next/headers";
-import {AuthState} from "@/src/actions/auth/auth/state/authState";
+import {AuthState} from "@/src/actions/auth/state/authState";
+import {sendLoginRequest} from "@/src/actions/auth/services/loginService";
+import {UnAuthorisedException} from "@/src/utils/exceptions/unAuthorisedException";
+import {ExistsException} from "@/src/utils/exceptions/existsException";
+import {registerService} from "@/src/actions/auth/services/registerService";
 
-export async function login(currentState: AuthState, formData: FormData) {
+export async function loginAction(currentState: AuthState, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     try {
-        console.log(`${process.env.SERVER_URL}/api/auth/login`)
-        const response = await fetch(`${process.env.SERVER_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({email, password} as LoginDTO),
-        });
+        const data = await sendLoginRequest({email, password});
 
-        if (!response.ok) {
-            if (response.status === 401) {
-                return {error: 'Invalid email or password'};
-            } else {
-                return {error: 'An unexpected error occurred. Please try again later.'};
-            }
-        }
-
-        const data = (await response.json()) as LoginResponseDTO;
-
-        (await cookies()).set('token', data.token, {
+        (await cookies()).set('session_token', data.token, {
             expires: new Date(data.expiresAt),
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -38,8 +24,64 @@ export async function login(currentState: AuthState, formData: FormData) {
 
         return redirect('/dashboard',);
     } catch (e) {
-        console.error(e);
-        return {error: 'An unexpected error occurred. Please try again later.'};
+        if (e instanceof UnAuthorisedException) {
+            return {
+                error: 'Invalid email or password',
+            };
+        }
+
+        return {
+            error: 'An error occurred. Please try again later',
+        };
     }
+}
+
+
+export async function signUpAction(currentState: AuthState, formData: FormData) {
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+    const dateOfBirth = formData.get('dateOfBirth') as string;
+
+    if (password !== confirmPassword) {
+        return {error: 'Passwords do not match'};
+    }
+
+    if (new Date(dateOfBirth) > new Date()) {
+        return {error: 'Date of birth cannot be in the future'};
+    }
+
+    if (new Date().getFullYear() - new Date(dateOfBirth).getFullYear() < 18) {
+        return {error: 'You must be at least 18 years old to register'};
+    }
+
+    try {
+        const data = await registerService({name, email, password, dateOfBirth});
+
+        (await cookies()).set('session_token', data.token, {
+            expires: new Date(data.expiresAt),
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            httpOnly: true,
+        });
+
+        return redirect('/create-company');
+
+    } catch (e) {
+
+
+        if (e instanceof ExistsException) {
+            return {
+                error: 'Email already exists',
+            };
+        }
+
+        return {
+            error: 'An error occurred. Please try again later',
+        }
+
+    }
+
 
 }

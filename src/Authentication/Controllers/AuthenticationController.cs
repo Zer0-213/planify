@@ -13,7 +13,7 @@ namespace WebApplication1.Authentication.Controllers;
 public class AuthenticationController(IAuthenticationService authService) : ControllerBase, IAuthenticationController
 {
     [HttpPost("login")]
-    public ActionResult<Response<SessionDto>> Login(LoginRequest request)
+    public ActionResult<SessionDto> Login(LoginRequest request)
     {
         try
         {
@@ -22,24 +22,12 @@ public class AuthenticationController(IAuthenticationService authService) : Cont
         }
         catch (UnauthorizedAccessException)
         {
-            return Unauthorized(
-                new Response<SessionDto>
-                {
-                    Success = false,
-                    Error = new ErrorDto
-                    {
-                        Code = 401,
-                        Message = "Unauthorized",
-                        Description = "Invalid email or password"
-                    }
-                }
-            );
+            return Unauthorized("Invalid email or password");
         }
         catch (Exception e)
         {
-            return StatusCode(502, new Response<SessionDto>
+            return StatusCode(502, new ErrResponse
             {
-                Success = false,
                 Error = new ErrorDto
                 {
                     Code = 502,
@@ -62,7 +50,7 @@ public class AuthenticationController(IAuthenticationService authService) : Cont
     }
 
     [HttpPost("register")]
-    public ActionResult<Response<RegisterDto>> CreateAccount(RegisterDto registerDto)
+    public ActionResult<RegisterDto> CreateAccount(RegisterDto registerDto)
     {
         try
         {
@@ -71,9 +59,8 @@ public class AuthenticationController(IAuthenticationService authService) : Cont
         catch (UserAlreadyExistsException e)
         {
             return Conflict(
-                new Response<RegisterDto>
+                new ErrResponse()
                 {
-                    Success = false,
                     Error = new ErrorDto
                     {
                         Code = 409,
@@ -86,9 +73,8 @@ public class AuthenticationController(IAuthenticationService authService) : Cont
         catch (Exception e)
         {
             Console.Write(e.Message);
-            return StatusCode(502, new Response<RegisterDto>
+            return StatusCode(502, new ErrResponse
             {
-                Success = false,
                 Error = new ErrorDto
                 {
                     Code = 502,

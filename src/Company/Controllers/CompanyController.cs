@@ -12,7 +12,7 @@ namespace WebApplication1.Company.Controllers;
 public class CompanyController(ICompanyService companyService) : ControllerBase, ICompanyController
 {
     [HttpPost("create-company")]
-    public ActionResult<Response<string>> CreateCompany(CreateCompanyDto createCompany)
+    public ActionResult<ErrResponse> CreateCompany(CreateCompanyDto createCompany)
     {
         try
         {
@@ -22,18 +22,13 @@ public class CompanyController(ICompanyService companyService) : ControllerBase,
             var success = companyService.CreateCompany(createCompany);
             if (!success) throw new Exception("An error occurred while creating the company.");
 
-            return Ok(new Response<string>
-            {
-                Success = true,
-                Data = "Company created successfully"
-            });
+            return Ok();
         }
         catch (InvalidOperationException e)
         {
             Console.WriteLine(e.Message);
-            return StatusCode(401, new Response<ErrorDto>
+            return StatusCode(401, new ErrResponse
             {
-                Success = false,
                 Error = new ErrorDto
                 {
                     Code = 401,
@@ -45,9 +40,8 @@ public class CompanyController(ICompanyService companyService) : ControllerBase,
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
-            return StatusCode(500, new Response<ErrorDto>
+            return StatusCode(500, new ErrResponse
             {
-                Success = false,
                 Error = new ErrorDto
                 {
                     Code = 500,
