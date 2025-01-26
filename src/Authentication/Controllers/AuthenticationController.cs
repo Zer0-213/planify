@@ -1,30 +1,47 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Authentication.DTOs;
+using Microsoft.Extensions.Caching.Memory;
 using WebApplication1.Authentication.Services;
 using WebApplication1.Common.DTOs;
-using WebApplication1.Common.Exceptions;
 using WebApplication1.Utils.Middleware;
 
 namespace WebApplication1.Authentication.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthenticationController(IAuthenticationService authService) : ControllerBase, IAuthenticationController
+public class AuthenticationController(IMemoryCache memoryCache, IAuthenticationService authService) : ControllerBase
 {
+
     [HttpPost("login")]
-    public ActionResult<SessionDto> Login(LoginRequest request)
+    public ActionResult Login(LoginRequest request)
     {
         try
         {
-            var user = authService.AuthenticateCredentials(request.Email, request.Password);
-            return Ok(user);
+            var session = authService.AuthenticateCredentials(request.Email, request.Password);
+
+            var sessionId = Guid.NewGuid().ToString();
+            memoryCache.Set(sessionId, new SessionCacheModel
+            {
+                UserId = session.UserId,
+                ExpiresAt = session.ExpiresAt,
+                CompanyId = session.CompanyId
+            }, session.ExpiresAt);
+
+            Response.Cookies.Append("SessionId", sessionId, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = session.ExpiresAt
+            });
+
+            return Ok(new { Message = "Login successful" });
         }
         catch (UnauthorizedAccessException)
         {
             return Unauthorized("Invalid email or password");
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return StatusCode(502, new ErrResponse
             {
@@ -38,50 +55,17 @@ public class AuthenticationController(IAuthenticationService authService) : Cont
         }
     }
 
-    [ServiceFilter<UserAuthFilter>]
+    [ServiceFilter(typeof(UserAuthFilter))]
     [HttpPost("logout")]
     public ActionResult Logout()
     {
-        HttpContext.Session.Clear();
-
-        if (Request.Cookies.ContainsKey(".AspNetCore.Session")) Response.Cookies.Delete(".AspNetCore.Session");
-
-        return Ok();
-    }
-
-    [HttpPost("register")]
-    public ActionResult<RegisterDto> CreateAccount(RegisterDto registerDto)
-    {
-        try
+        // Get session ID from cookie
+        if (Request.Cookies.TryGetValue("SessionId", out var sessionId))
         {
-            return Ok(authService.RegisterUser(registerDto));
+            memoryCache.Remove(sessionId); // Remove session from cache
+            Response.Cookies.Delete("SessionId"); // Remove cookie
         }
-        catch (UserAlreadyExistsException e)
-        {
-            return Conflict(
-                new ErrResponse()
-                {
-                    Error = new ErrorDto
-                    {
-                        Code = 409,
-                        Message = "Conflict",
-                        Description = e.Message
-                    }
-                }
-            );
-        }
-        catch (Exception e)
-        {
-            Console.Write(e.Message);
-            return StatusCode(502, new ErrResponse
-            {
-                Error = new ErrorDto
-                {
-                    Code = 502,
-                    Message = "Bad Gateway",
-                    Description = "An error occurred while processing your request"
-                }
-            });
-        }
+
+        return Ok(new { Message = "Logged out successfully" });
     }
 }

@@ -1,13 +1,15 @@
-﻿using WebApplication1.Authentication.Models;
+﻿using Microsoft.Extensions.Caching.Memory;
+using WebApplication1.Authentication.Models;
 using WebApplication1.Common.Exceptions;
 using WebApplication1.Data;
 using WebApplication1.User;
-using static System.Console;
+using WebApplication1.Utils.Middleware;
 
 namespace WebApplication1.Authentication.Repositories;
 
-public class AuthenticationRepository(AppDbContext dbContext) : IAuthenticationRepository
+public class AuthenticationRepository(AppDbContext dbContext, IMemoryCache memoryCache) : IAuthenticationRepository
 {
+
     public SessionModel? Authenticate(string email, string password)
     {
         var user = dbContext.Users
@@ -15,55 +17,61 @@ public class AuthenticationRepository(AppDbContext dbContext) : IAuthenticationR
 
         if (user == null) return null;
 
-        if (!VerifyPassword(password, user.PasswordHashed)) return null;
+        if (!VerifyPassword(password, user.PasswordHashed)) return null; 
 
-        var token = Guid.NewGuid().ToString();
+        var sessionId = Guid.NewGuid().ToString();
         var session = new SessionModel
         {
             UserId = user.Id,
-            TokenHash = HashString(token),
-            ExpiresAt = DateTime.UtcNow.AddDays(7)
+            TokenHash = sessionId, 
+            ExpiresAt = DateTime.UtcNow.AddDays(7) 
         };
-
-        dbContext.Sessions.Add(session);
-        dbContext.SaveChanges();
+        
+        memoryCache.Set(sessionId, new SessionCacheModel
+        {
+            UserId = user.Id,
+            ExpiresAt = session.ExpiresAt,
+            CompanyId = user.CompanyId 
+        }, session.ExpiresAt);
 
         return new SessionModel
         {
-            Id = session.Id,
-            TokenHash = token,
-            ExpiresAt = session.ExpiresAt
+            TokenHash = sessionId, 
+            ExpiresAt = session.ExpiresAt,
+            UserId = user.Id
         };
     }
 
-
     public SessionModel CreateAccount(UserModel user)
     {
-            var existingUser = dbContext.Users.FirstOrDefault(u => u.Email == user.Email);
-            if (existingUser != null) throw new UserAlreadyExistsException(user.Email);
+        var existingUser = dbContext.Users.FirstOrDefault(u => u.Email == user.Email);
+        if (existingUser != null) throw new UserAlreadyExistsException(user.Email);
 
-            user.PasswordHashed = HashString(user.PasswordHashed);
-            dbContext.Users.Add(user);
-            dbContext.SaveChanges();
+        user.PasswordHashed = HashString(user.PasswordHashed);
+        dbContext.Users.Add(user);
+        dbContext.SaveChanges();
 
-           var token = Guid.NewGuid().ToString();
-            var session = new SessionModel
-            {
-                UserId = user.Id,
-                TokenHash = HashString(token),
-                ExpiresAt = DateTime.UtcNow.AddDays(7)
-            };
+        var sessionId = Guid.NewGuid().ToString();
+        var session = new SessionModel
+        {
+            UserId = user.Id,
+            TokenHash = sessionId, 
+            ExpiresAt = DateTime.UtcNow.AddDays(7)
+        };
 
-            dbContext.Sessions.Add(session);
-            dbContext.SaveChanges();
+        memoryCache.Set(sessionId, new SessionCacheModel
+        {
+            UserId = user.Id,
+            ExpiresAt = session.ExpiresAt,
+            CompanyId = user.CompanyId 
+        }, session.ExpiresAt);
 
-            return new SessionModel
-            {
-                Id = session.Id,
-                TokenHash = token,
-                ExpiresAt = session.ExpiresAt
-            };
-        
+        return new SessionModel
+        {
+            TokenHash = sessionId, 
+            ExpiresAt = session.ExpiresAt,
+            UserId = user.Id
+        };
     }
 
     private static bool VerifyPassword(string plainPassword, string hashedPassword)

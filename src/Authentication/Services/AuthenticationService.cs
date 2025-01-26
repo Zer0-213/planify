@@ -15,7 +15,8 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
         return new SessionDto
         {
                 Token = session.TokenHash,
-                ExpiresAt = session.ExpiresAt
+                ExpiresAt = session.ExpiresAt,
+                UserId = session.UserId,
         };
     }
 
@@ -33,7 +34,8 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
         return new SessionDto
         {
                 Token = result.TokenHash,
-                ExpiresAt = result.ExpiresAt
+                ExpiresAt = result.ExpiresAt,
+                UserId = result.UserId,
         };
     }
 }

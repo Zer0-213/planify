@@ -15,7 +15,13 @@ builder.Configuration
 
 builder.Services.AddOpenApi();
 builder.Services.AddDistributedMemoryCache();
-
+builder.Services.AddMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(24 * 7);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

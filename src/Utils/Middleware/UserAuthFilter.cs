@@ -1,78 +1,62 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Caching.Memory;
 using WebApplication1.Common.DTOs;
-using WebApplication1.Data;
 
 namespace WebApplication1.Utils.Middleware;
 
-public class UserAuthFilter(AppDbContext dbContext, bool checkCompanyId = true) : IAuthorizationFilter
+public class UserAuthFilter(IMemoryCache memoryCache, bool checkCompanyId = true) : IAuthorizationFilter
 {
-    private readonly AppDbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         var httpContext = context.HttpContext;
+        Console.WriteLine(httpContext.Request.Cookies["SessionId"]);
 
-        if (!httpContext.Request.Headers.TryGetValue("Authorization", out var sessionData))
+        if (!httpContext.Request.Cookies.TryGetValue("SessionId", out var sessionId))
         {
-            context.Result = new JsonResult(new ErrResponse
-            {
-                Error = new ErrorDto
-                {
-                    Code = 401,
-                    Message = "Unauthorized",
-                    Description = "No session id provided"
-                }
-            })
-            {
-                StatusCode = 401
-            };
+            context.Result = UnauthorizedResponse("No session cookie provided");
             return;
         }
 
-        var sessions = _dbContext.Sessions.ToList();
-        var session = sessions.FirstOrDefault(s => VerifyHash(sessionData.ToString(), s.TokenHash));
-        if (session == null || session.ExpiresAt <= DateTime.UtcNow)
+        if (!_memoryCache.TryGetValue(sessionId, out SessionCacheModel? session) || session?.ExpiresAt <= DateTime.UtcNow)
         {
-            context.Result = new JsonResult(new ErrResponse
-            {
-                Error = new ErrorDto
-                {
-                    Code = 401,
-                    Message = "Unauthorized",
-                    Description = "No session id provided or session expired"
-                }
-            })
-            {
-                StatusCode = 401
-            };
+            context.Result = UnauthorizedResponse("Session expired or invalid");
             return;
         }
 
-        var user = _dbContext.Users.Find(session.UserId);
-
-        if (checkCompanyId && user?.CompanyId == null)
+        if (checkCompanyId && session?.CompanyId == null)
         {
-            context.Result = new JsonResult(new ErrResponse
-            {
-                Error = new ErrorDto
-                {
-                    Code = 401,
-                    Message = "No company id",
-                    Description = "User does not belong to a company"
-                }
-            })
-            {
-                StatusCode = 401
-            };
+            context.Result = UnauthorizedResponse("User does not belong to a company");
             return;
         }
+        
+        Console.WriteLine($"User {session?.UserId} authenticated");
 
-        httpContext.Items["userId"] = user!.Id;
+        httpContext.Items["userId"] = session?.UserId;
     }
 
-    private static bool VerifyHash(string plainText, string hashedText)
+    private static JsonResult UnauthorizedResponse(string description)
     {
-        return BCrypt.Net.BCrypt.Verify(plainText, hashedText);
+        return new JsonResult(new ErrResponse
+        {
+            Error = new ErrorDto
+            {
+                Code = 401,
+                Message = "Unauthorized",
+                Description = description
+            }
+        })
+        {
+            StatusCode = 401
+        };
     }
+}
+
+public class SessionCacheModel
+{
+    public int UserId { get; set; }
+    public DateTime ExpiresAt { get; set; }
+    public int? CompanyId { get; set; }
 }
