@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
+using WebApplication1.Authentication.Models;
 using WebApplication1.Common.DTOs;
 
 namespace WebApplication1.Utils.Middleware;
@@ -12,7 +13,6 @@ public class UserAuthFilter(IMemoryCache memoryCache, bool checkCompanyId = true
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         var httpContext = context.HttpContext;
-        Console.WriteLine(httpContext.Request.Cookies["SessionId"]);
 
         if (!httpContext.Request.Cookies.TryGetValue("SessionId", out var sessionId))
         {
@@ -32,8 +32,6 @@ public class UserAuthFilter(IMemoryCache memoryCache, bool checkCompanyId = true
             return;
         }
         
-        Console.WriteLine($"User {session?.UserId} authenticated");
-
         httpContext.Items["userId"] = session?.UserId;
     }
 
@@ -52,11 +50,4 @@ public class UserAuthFilter(IMemoryCache memoryCache, bool checkCompanyId = true
             StatusCode = 401
         };
     }
-}
-
-public class SessionCacheModel
-{
-    public int UserId { get; set; }
-    public DateTime ExpiresAt { get; set; }
-    public int? CompanyId { get; set; }
 }

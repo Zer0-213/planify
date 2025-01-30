@@ -4,6 +4,12 @@ using WebApplication1.User;
 
 namespace WebApplication1.Authentication.Services;
 
+public interface IAuthenticationService
+{
+    SessionDto AuthenticateCredentials(string email, string password);
+    SessionDto RegisterUser(RegisterDto registerDto);
+}
+
 public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthenticationService
 {
     public SessionDto AuthenticateCredentials(string email, string password)
@@ -14,9 +20,10 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
 
         return new SessionDto
         {
-                Token = session.TokenHash,
+                Token = session.Token,
                 ExpiresAt = session.ExpiresAt,
                 UserId = session.UserId,
+                CompanyId = session.CompanyId
         };
     }
 
@@ -33,9 +40,10 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
 
         return new SessionDto
         {
-                Token = result.TokenHash,
+                Token = result.Token,
                 ExpiresAt = result.ExpiresAt,
                 UserId = result.UserId,
+                CompanyId = null
         };
     }
 }

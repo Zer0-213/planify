@@ -18,24 +18,16 @@ public class AuthenticationController(IMemoryCache memoryCache, IAuthenticationS
         try
         {
             var session = authService.AuthenticateCredentials(request.Email, request.Password);
-
-            var sessionId = Guid.NewGuid().ToString();
-            memoryCache.Set(sessionId, new SessionCacheModel
-            {
-                UserId = session.UserId,
-                ExpiresAt = session.ExpiresAt,
-                CompanyId = session.CompanyId
-            }, session.ExpiresAt);
-
-            Response.Cookies.Append("SessionId", sessionId, new CookieOptions
+            
+            Response.Cookies.Append("SessionId", session.Token, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
                 Expires = session.ExpiresAt
             });
-
-            return Ok(new { Message = "Login successful" });
+            
+            return Ok(session);
         }
         catch (UnauthorizedAccessException)
         {

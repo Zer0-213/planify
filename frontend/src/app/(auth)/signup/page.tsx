@@ -8,9 +8,10 @@ import AuthLink from "@/src/app/(auth)/login/authLink";
 import {useActionState} from "react";
 import {signUpAction} from "@/src/actions/auth";
 import ErrorText from "@/src/components/ui/texts/errorTexts";
+import {AuthState} from "@/src/actions/auth/state/authState";
 
 const SignupPage = () => {
-    const initialState = {
+    const initialState: AuthState = {
         error: null
     }
 

@@ -7,10 +7,16 @@ using WebApplication1.Utils.Middleware;
 
 namespace WebApplication1.Authentication.Repositories;
 
+public interface IAuthenticationRepository
+{
+    SessionCacheModel? Authenticate(string email, string password);
+    SessionCacheModel CreateAccount(UserModel registerDto);
+}
+
 public class AuthenticationRepository(AppDbContext dbContext, IMemoryCache memoryCache) : IAuthenticationRepository
 {
 
-    public SessionModel? Authenticate(string email, string password)
+    public SessionCacheModel? Authenticate(string email, string password)
     {
         var user = dbContext.Users
             .FirstOrDefault(u => u.Email == email);
@@ -19,30 +25,21 @@ public class AuthenticationRepository(AppDbContext dbContext, IMemoryCache memor
 
         if (!VerifyPassword(password, user.PasswordHashed)) return null; 
 
-        var sessionId = Guid.NewGuid().ToString();
-        var session = new SessionModel
+        
+        var sessionCache = new SessionCacheModel
         {
             UserId = user.Id,
-            TokenHash = sessionId, 
-            ExpiresAt = DateTime.UtcNow.AddDays(7) 
+            CompanyId = user.CompanyId,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            Token =  Guid.NewGuid().ToString()
         };
         
-        memoryCache.Set(sessionId, new SessionCacheModel
-        {
-            UserId = user.Id,
-            ExpiresAt = session.ExpiresAt,
-            CompanyId = user.CompanyId 
-        }, session.ExpiresAt);
+        memoryCache.Set(sessionCache.Token, sessionCache,sessionCache.ExpiresAt);
 
-        return new SessionModel
-        {
-            TokenHash = sessionId, 
-            ExpiresAt = session.ExpiresAt,
-            UserId = user.Id
-        };
+        return sessionCache;
     }
 
-    public SessionModel CreateAccount(UserModel user)
+    public SessionCacheModel CreateAccount(UserModel user)
     {
         var existingUser = dbContext.Users.FirstOrDefault(u => u.Email == user.Email);
         if (existingUser != null) throw new UserAlreadyExistsException(user.Email);
@@ -51,27 +48,18 @@ public class AuthenticationRepository(AppDbContext dbContext, IMemoryCache memor
         dbContext.Users.Add(user);
         dbContext.SaveChanges();
 
-        var sessionId = Guid.NewGuid().ToString();
-        var session = new SessionModel
+        var sessionCache = new SessionCacheModel()
         {
             UserId = user.Id,
-            TokenHash = sessionId, 
-            ExpiresAt = DateTime.UtcNow.AddDays(7)
+            CompanyId = user.CompanyId,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            Token = Guid.NewGuid().ToString()
         };
+        
 
-        memoryCache.Set(sessionId, new SessionCacheModel
-        {
-            UserId = user.Id,
-            ExpiresAt = session.ExpiresAt,
-            CompanyId = user.CompanyId 
-        }, session.ExpiresAt);
+        memoryCache.Set(sessionCache.Token, sessionCache, sessionCache.ExpiresAt);
 
-        return new SessionModel
-        {
-            TokenHash = sessionId, 
-            ExpiresAt = session.ExpiresAt,
-            UserId = user.Id
-        };
+        return sessionCache;
     }
 
     private static bool VerifyPassword(string plainPassword, string hashedPassword)
