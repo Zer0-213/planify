@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WebApplication1.User;
+using WebApplication1.User.Models;
 
 namespace WebApplication1.Data;
 

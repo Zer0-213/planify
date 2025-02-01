@@ -1,6 +1,6 @@
 ﻿using WebApplication1.Authentication.DTOs;
 using WebApplication1.Authentication.Repositories;
-using WebApplication1.User;
+using WebApplication1.User.Models;
 
 namespace WebApplication1.Authentication.Services;
 
@@ -35,7 +35,7 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
             LastName = registerDto.LastName,
             Email = registerDto.Email,
             PasswordHashed = registerDto.Password,
-            DateOfBirth = registerDto.DateOfBirth
+            DateOfBirth = DateOnly.FromDateTime(registerDto.DateOfBirth)
         });
 
         return new SessionDto

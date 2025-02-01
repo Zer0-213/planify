@@ -12,7 +12,7 @@ public class CompanyService(ICompanyRepository companyRepository) : ICompanyServ
             new CompanyModel
             {
                 Name = createCompany.CompanyName,
-                PhoneNumber = createCompany.CompanyPhone,
+                PhoneNumber = createCompany.CompanyNumber,
                 Type = createCompany.CompanyType
             });
 

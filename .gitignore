@@ -6,3 +6,4 @@ riderModule.iml
 .idea
 appsettings.Development.json
 appsettings.Production.json
+node_modules

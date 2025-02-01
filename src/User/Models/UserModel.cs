@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using WebApplication1.Company.Models;
 
-namespace WebApplication1.User;
+namespace WebApplication1.User.Models;
 
 [Table("users")]
 public class UserModel
@@ -31,7 +31,7 @@ public class UserModel
     [Required]
     public string PasswordHashed { get; set; } = "";
 
-    [Column("date_of_birth")] public DateTime? DateOfBirth { get; set; }
+    [Column("date_of_birth")] public DateOnly? DateOfBirth { get; set; }
 
     [Column("company_id")] public int? CompanyId { get; set; }
 

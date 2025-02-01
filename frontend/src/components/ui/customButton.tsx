@@ -1,16 +1,15 @@
 import {Button} from "flowbite-react";
 
 type Props = {
-    children: React.ReactNode;
     onClick?: () => void;
     className?: string;
     disabled?: boolean;
     type?: "button" | "submit" | "reset";
     isLoading?: boolean;
+    text?: string;
 }
 
-const CustomButton = ({children, onClick, disabled, type, isLoading}: Props) => {
-
+const CustomButton = ({onClick, disabled, type, isLoading, text = "Submit"}: Props) => {
     return (
         <Button
             type={type || "button"}
@@ -19,7 +18,7 @@ const CustomButton = ({children, onClick, disabled, type, isLoading}: Props) => 
             isProcessing={isLoading}
             color={disabled ? "gray" : "blue"}
         >
-            {children}
+            {text}
         </Button>
     );
 }

@@ -3,7 +3,7 @@ using WebApplication1.Authentication.Models;
 using WebApplication1.Company.Models;
 using WebApplication1.Permission;
 using WebApplication1.Roles;
-using WebApplication1.User;
+using WebApplication1.User.Models;
 using WebApplication1.UserRole.Models;
 
 namespace WebApplication1.Data;

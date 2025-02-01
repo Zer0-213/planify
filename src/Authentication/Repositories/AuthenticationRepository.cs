@@ -2,8 +2,7 @@
 using WebApplication1.Authentication.Models;
 using WebApplication1.Common.Exceptions;
 using WebApplication1.Data;
-using WebApplication1.User;
-using WebApplication1.Utils.Middleware;
+using WebApplication1.User.Models;
 
 namespace WebApplication1.Authentication.Repositories;
 
@@ -11,6 +10,7 @@ public interface IAuthenticationRepository
 {
     SessionCacheModel? Authenticate(string email, string password);
     SessionCacheModel CreateAccount(UserModel registerDto);
+    SessionCacheModel? VerifySession(string? sessionId);
 }
 
 public class AuthenticationRepository(AppDbContext dbContext, IMemoryCache memoryCache) : IAuthenticationRepository
@@ -23,18 +23,18 @@ public class AuthenticationRepository(AppDbContext dbContext, IMemoryCache memor
 
         if (user == null) return null;
 
-        if (!VerifyPassword(password, user.PasswordHashed)) return null; 
+        if (!VerifyPassword(password, user.PasswordHashed)) return null;
 
-        
+
         var sessionCache = new SessionCacheModel
         {
             UserId = user.Id,
             CompanyId = user.CompanyId,
             ExpiresAt = DateTime.UtcNow.AddDays(7),
-            Token =  Guid.NewGuid().ToString()
+            Token = Guid.NewGuid().ToString()
         };
-        
-        memoryCache.Set(sessionCache.Token, sessionCache,sessionCache.ExpiresAt);
+
+        memoryCache.Set(sessionCache.Token, sessionCache, sessionCache.ExpiresAt);
 
         return sessionCache;
     }
@@ -55,10 +55,25 @@ public class AuthenticationRepository(AppDbContext dbContext, IMemoryCache memor
             ExpiresAt = DateTime.UtcNow.AddDays(7),
             Token = Guid.NewGuid().ToString()
         };
-        
+
 
         memoryCache.Set(sessionCache.Token, sessionCache, sessionCache.ExpiresAt);
 
+        return sessionCache;
+    }
+
+    public SessionCacheModel? VerifySession(string? sessionId)
+    {
+        var found = memoryCache.TryGetValue<SessionCacheModel>(sessionId, out var sessionCache);
+
+        if (!found || sessionCache == null) return null;
+
+        if (sessionCache.ExpiresAt <= DateTime.UtcNow)
+        {
+            memoryCache.Remove(sessionId);
+            return null;
+        }
+        
         return sessionCache;
     }
 

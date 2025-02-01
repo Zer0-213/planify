@@ -1,4 +1,5 @@
 ﻿using WebApplication1.Data;
+using WebApplication1.User.Models;
 
 namespace WebApplication1.User.Repositories;
 

@@ -2,29 +2,31 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using WebApplication1.Authentication.Models;
+using WebApplication1.Authentication.Repositories;
 using WebApplication1.Common.DTOs;
 
 namespace WebApplication1.Utils.Middleware;
 
-public class UserAuthFilter(IMemoryCache memoryCache, bool checkCompanyId = true) : IAuthorizationFilter
+public class UserAuthFilter(IAuthenticationRepository authRepo, bool checkCompanyId = true) : IAuthorizationFilter
 {
-    private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         var httpContext = context.HttpContext;
 
-        if (!httpContext.Request.Cookies.TryGetValue("SessionId", out var sessionId))
+        if (!httpContext.Request.Headers.TryGetValue("Authorization", out var sessionId))
         {
             context.Result = UnauthorizedResponse("No session cookie provided");
             return;
         }
-
-        if (!_memoryCache.TryGetValue(sessionId, out SessionCacheModel? session) || session?.ExpiresAt <= DateTime.UtcNow)
+        
+        var session = authRepo.VerifySession(sessionId);
+        if (session == null)
         {
             context.Result = UnauthorizedResponse("Session expired or invalid");
             return;
         }
+        
 
         if (checkCompanyId && session?.CompanyId == null)
         {

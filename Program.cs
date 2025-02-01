@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using WebApplication1.Authentication.Services;
 using WebApplication1.Company.Services;
 using WebApplication1.Data;
@@ -14,45 +15,27 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 builder.Services.AddOpenApi();
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromHours(24 * 7);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+builder.Services.AddSingleton<IMemoryCache,MemoryCache>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-// Add services to provider.
 builder.Services.AddAuthenticationServices();
 builder.Services.AddUserServices();
 builder.Services.AddCompanyServices();
 
 
-// Add controllers to providers.
 builder.Services.AddControllers();
 
-// Add middleware to providers.
 builder.Services.AddScoped<UserAuthFilter>();
-
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
+
 app.UseHttpsRedirection();
-app.UseSession();
 
 app.MapControllers();
 

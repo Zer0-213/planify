@@ -1,7 +1,6 @@
 "use client";
 
 import FormModal from "@/src/components/ui/modals/formModal";
-import Header from "@/src/components/ui/texts/header";
 import CustomButton from "@/src/components/ui/customButton";
 import FormLabel from "@/src/components/ui/texts/formLabel";
 import AuthLink from "@/src/app/(auth)/login/authLink";
@@ -18,20 +17,32 @@ const SignupPage = () => {
     const [formState, formAction, isPending] = useActionState(signUpAction, initialState)
 
     return (
-        <FormModal>
-            <Header text="Sign Up"/>
+        <FormModal header="Sign Up">
             <form action={formAction} className="mt-6">
-                <FormLabel htmlFor="name">
-                    Name
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                        placeholder="Enter your name"
-                        required
-                    />
-                </FormLabel>
+                <div className="flex flex-row gap-2.5">
+                    <FormLabel htmlFor="firstName">
+                        First Name
+                        <input
+                            type="text"
+                            id="firstName"
+                            name="firstName"
+                            className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            placeholder="Enter your name"
+                            required
+                        />
+                    </FormLabel>
+                    <FormLabel htmlFor="lastName">
+                        Last Name
+                        <input
+                            type="text"
+                            id="lastName"
+                            name="lastName"
+                            className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            placeholder="Enter your name"
+                            required
+                        />
+                    </FormLabel>
+                </div>
                 <FormLabel htmlFor="email">
                     Email
                     <input
@@ -65,10 +76,18 @@ const SignupPage = () => {
                         required
                     />
                 </FormLabel>
+                <FormLabel htmlFor={"dateOfBirth"}>
+                    Date of Birth
+                    <input
+                        type="date"
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                        required
+                    />
+                </FormLabel>
                 <div className="flex flex-col w-full justify-center">
-                    <CustomButton type="submit" isLoading={isPending}>
-                        Sign Up
-                    </CustomButton>
+                    <CustomButton type="submit" isLoading={isPending} text="Sign Up"/>
                 </div>
             </form>
             <AuthLink href={'/login'}/>

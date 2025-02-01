@@ -1,7 +1,4 @@
-//import Form from "next/form";
-
 'use client'
-
 import {loginAction} from "@/src/actions/auth";
 import {AuthState} from "@/src/actions/auth/state/authState";
 import {useActionState} from "react";
@@ -9,7 +6,6 @@ import CustomButton from "../../../components/ui/customButton";
 import ErrorText from "@/src/components/ui/texts/errorTexts";
 import FormLabel from "@/src/components/ui/texts/formLabel";
 import FormModal from "@/src/components/ui/modals/formModal";
-import Header from "@/src/components/ui/texts/header";
 import AuthLink from "@/src/app/(auth)/login/authLink";
 
 
@@ -19,8 +15,7 @@ const LoginPage = () => {
     }
     const [formState, formAction, isPending] = useActionState(loginAction, initialState)
     return (
-        <FormModal>
-            <Header text="Login"/>
+        <FormModal header="Login">
             <form action={formAction} className="mt-6">
                 <FormLabel htmlFor="email">
                     Email
@@ -45,9 +40,7 @@ const LoginPage = () => {
                     />
                 </FormLabel>
                 <div className="flex flex-col w-full justify-center gap-2">
-                    <CustomButton type="submit" isLoading={isPending}>
-                        Log In
-                    </CustomButton>
+                    <CustomButton type="submit" isLoading={isPending} text="Log In"/>
                     {formState.error && <ErrorText text={formState.error}/>}
                 </div>
             </form>

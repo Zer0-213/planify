@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WebApplication1.User;
+using WebApplication1.User.Models;
 
 namespace WebApplication1.Authentication.Models;
 

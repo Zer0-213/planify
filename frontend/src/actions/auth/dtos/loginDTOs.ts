@@ -4,6 +4,8 @@ export type LoginDTO = {
 }
 
 export type LoginResponseDTO = {
+    userId: number;
     token: string;
     expiresAt: string;
+    companyId: number | null;
 }
