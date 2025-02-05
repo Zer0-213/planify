@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using WebApplication1.Authentication.DTOs;
-using WebApplication1.Authentication.Models;
 using WebApplication1.Authentication.Services;
 using WebApplication1.Common.DTOs;
 using WebApplication1.Common.Exceptions;

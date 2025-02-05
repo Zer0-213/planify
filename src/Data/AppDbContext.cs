@@ -3,6 +3,7 @@ using WebApplication1.Authentication.Models;
 using WebApplication1.Company.Models;
 using WebApplication1.Permission;
 using WebApplication1.Roles;
+using WebApplication1.Shifts.Models;
 using WebApplication1.User.Models;
 using WebApplication1.UserRole.Models;
 
@@ -16,6 +17,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<SessionModel> Sessions { get; set; }
     public DbSet<CompanyModel> Companies { get; set; }
     public DbSet<UserRoleModel> UserRoles { get; set; }
+    public DbSet<ShiftModel> Shifts { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +28,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.ApplyConfiguration(new SessionConfiguration());
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+        modelBuilder.ApplyConfiguration(new ShiftConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

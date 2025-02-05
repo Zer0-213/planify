@@ -16,7 +16,7 @@ public class UserAuthFilter(IAuthenticationRepository authRepo, bool checkCompan
 
         if (!httpContext.Request.Headers.TryGetValue("Authorization", out var sessionId))
         {
-            context.Result = UnauthorizedResponse("No session cookie provided");
+            context.Result = UnauthorizedResponse("No session token provided");
             return;
         }
         
@@ -35,6 +35,7 @@ public class UserAuthFilter(IAuthenticationRepository authRepo, bool checkCompan
         }
         
         httpContext.Items["userId"] = session?.UserId;
+        httpContext.Items["companyId"] = session?.CompanyId;
     }
 
     private static JsonResult UnauthorizedResponse(string description)

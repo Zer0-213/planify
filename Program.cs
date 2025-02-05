@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using WebApplication1.Authentication.Services;
 using WebApplication1.Company.Services;
 using WebApplication1.Data;
+using WebApplication1.Shifts.Services;
 using WebApplication1.User.Services;
 using WebApplication1.Utils.Middleware;
 
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAuthenticationServices();
 builder.Services.AddUserServices();
 builder.Services.AddCompanyServices();
+builder.Services.AddShiftService();
 
 
 builder.Services.AddControllers();
