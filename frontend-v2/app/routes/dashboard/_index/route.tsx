@@ -29,7 +29,7 @@ export async function loader({request}: { request: Request }) {
 
 const getDashboardData = (todayShifts: number, employeesScheduled: number, uncoveredShifts: number) => [
     {
-        header: "Shifts Today",
+        header: "Staff Count Today",
         text: todayShifts.toString(),
         textColor: "blue" as "blue",
     },
