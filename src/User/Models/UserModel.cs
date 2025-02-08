@@ -31,9 +31,16 @@ public class UserModel
     [Required]
     public string PasswordHashed { get; set; } = "";
 
-    [Column("date_of_birth")] public DateOnly? DateOfBirth { get; set; }
+    [Column("date_of_birth")]
+    [Required]
+    public DateOnly? DateOfBirth { get; set; }
 
     [Column("company_id")] public int? CompanyId { get; set; }
+    
+    [Column("phone_number")]
+    [MaxLength(15)]
+    [Required]
+    public string PhoneNumber { get; set; } = "";
 
     public CompanyModel Company { get; set; } = null!;
 }

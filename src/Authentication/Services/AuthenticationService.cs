@@ -35,7 +35,8 @@ public class AuthenticationService(IAuthenticationRepository authRepo) : IAuthen
             LastName = registerDto.LastName,
             Email = registerDto.Email,
             PasswordHashed = registerDto.Password,
-            DateOfBirth = DateOnly.FromDateTime(registerDto.DateOfBirth)
+            DateOfBirth = DateOnly.FromDateTime(registerDto.DateOfBirth),
+            PhoneNumber = registerDto.PhoneNumber
         });
 
         return new SessionDto

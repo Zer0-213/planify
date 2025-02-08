@@ -13,7 +13,8 @@ const DashboardNavbar = () => {
                     return (
                         <NavLink key={route.name}
                                  to={route.route}
-                                 className={({isActive}) => getNavLinkClass(isActive)}>
+                                 className={({isActive}) => getNavLinkClass(isActive)}
+                                 end>
                             {route.name}
                         </NavLink>
                     );

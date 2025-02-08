@@ -1,8 +1,8 @@
 enum DashboardRoutes {
     HOME = "/dashboard",
     ME = "/dashboard/me",
-    SCHEDULE = "/schedule",
-    STAFF = "/staff",
+    SCHEDULE = "/dashboard/schedule",
+    STAFF = "/dashboard/staff",
 }
 
 type DashboardRoutesType = {
