@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import AppTable from '@/components/AppTable.vue';
+import { ArrowButton, Button } from '@/components/ui/button';
+import { WeekPicker } from '@/components/ui/week-picker';
 import AppLayout from '@/layouts/AppLayout.vue';
-import CreateShiftsDialogue from '@/pages/shifts/partials/CreateShiftsDialogue.vue';
 import { columns, ShiftRow } from '@/pages/shifts/table/columns';
 import type { BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/vue3';
@@ -25,8 +26,15 @@ defineProps<{
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="space-y-10 p-6">
             <div v-if="permissions?.includes('create_shifts')" class="flex flex-1 justify-end">
-                <CreateShiftsDialogue />
+                <Button>Publish</Button>
             </div>
+
+            <div class="flex w-full justify-center space-x-2">
+                <ArrowButton direction="left" />
+                <WeekPicker />
+                <ArrowButton />
+            </div>
+
             <AppTable :columns="columns" :data="shifts" />
         </div>
     </AppLayout>

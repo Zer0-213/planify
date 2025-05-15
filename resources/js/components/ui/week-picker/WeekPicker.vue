@@ -8,13 +8,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { DateValue } from '@internationalized/date';
 
 const props = defineProps<{
-    modelValue?: Date
+    initialDate?: Date
 }>();
 
 const emit = defineEmits(['update:modelValue']);
 
 const isOpen = ref(false);
-const date = ref((props.modelValue || new Date()));
+const date = ref((props.initialDate || new Date()));
 
 const weekRange = computed(() => {
     const start = startOfWeek(date.value, { weekStartsOn: 1 }); // Week starts on Monday
@@ -57,12 +57,12 @@ const handleSelect = (selectedDate: DateValue | undefined) => {
             <Button
                 :class="[
           'w-[280px] justify-start text-left font-normal',
-          !props.modelValue && 'text-muted-foreground'
+          !props.initialDate && 'text-muted-foreground'
         ]"
                 variant="outline"
             >
                 <CalendarIcon class="mr-2 h-4 w-4" />
-                {{ props.modelValue ? formattedWeekRange : 'Select week' }}
+                {{ props.initialDate ? formattedWeekRange : 'Select week' }}
             </Button>
         </PopoverTrigger>
         <PopoverContent class="w-auto p-0">
