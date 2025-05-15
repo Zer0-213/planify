@@ -5,12 +5,11 @@ namespace App\Http\Middleware;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
     /**
-     * The root template that's loaded on the first page visit.
+     * The root template loaded on the first page visit.
      *
      * @see https://inertiajs.com/server-side-setup#root-template
      *
@@ -40,7 +39,7 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
         $user = $request->user();
         $company = $user ? $user->companies()->first() : null;
-        $permissions = $user ? $user->getPermissionsForCompany($company) : [];
+        $permissions = $user && $company ? $user->getPermissionsForCompany($company) : [];
 
         return [
             ...parent::share($request),
