@@ -4,6 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-vue-ne
 
 interface Props {
     direction?: 'right' | 'left' | 'up' | 'down';
+    onPress?: () => void | Promise<void>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -19,7 +20,7 @@ const chevronIcon = {
 </script>
 
 <template>
-    <Button size="icon" variant="outline">
+    <Button size="icon" variant="outline" @click="props.onPress">
         <component :is="chevronIcon[props.direction]" class="w-4 h-4" />
     </Button>
 </template>

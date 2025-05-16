@@ -7,9 +7,15 @@ use Carbon\Carbon;
 
 class GetCompanyShiftsForWeek
 {
-    public function execute(Company $company): array
+    public function execute(Company $company, Carbon $startWeek, Carbon $endWeek): array
     {
-        return $company->companyUsers()->with(['user', 'shifts'])->get()->map(function ($companyUser) {
+
+        return $company->companyUsers()->with(['user', 'shifts' => function ($query) use ($startWeek, $endWeek) {
+            $query->whereBetween('starts_at', [
+                $startWeek->startOfDay(),
+                $endWeek->endOfDay()
+            ]);
+        }])->get()->map(function ($companyUser) {
             $shifts = $companyUser->shifts->groupBy(function ($shift) {
                 return strtolower(Carbon::parse($shift->starts_at)->format('l'));
             });
@@ -25,6 +31,7 @@ class GetCompanyShiftsForWeek
                 'sunday' => $this->formatShift($shifts->get('sunday')?->first()),
             ];
         })->toArray();
+
     }
 
     private function formatShift(?object $shift): ?string

@@ -13,7 +13,7 @@ export type ShiftRow = {
     sunday: NullableString;
 };
 
-export const columns: ColumnDef<ShiftRow>[] = [
+export const shiftColumns: ColumnDef<ShiftRow>[] = [
     {
         accessorKey: 'name',
         header: 'Name',
