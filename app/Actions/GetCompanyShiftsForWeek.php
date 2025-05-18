@@ -36,7 +36,7 @@ class GetCompanyShiftsForWeek
 
     private function formatShift(?object $shift): ?string
     {
-        if (!$shift) return null;
+        if (!$shift) return "";
 
         $start = Carbon::parse($shift->starts_at);
         $end = Carbon::parse($shift->ends_at);

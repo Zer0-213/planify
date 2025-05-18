@@ -27,7 +27,7 @@ const props = defineProps<{
 
 const weekFormatted = ref(new Date(props.week));
 
-const { currentShifts, hasChanged, handleCellUpdate } = useShifts(props.shifts);
+const { hasChanged, handleCellUpdate, handleCancel } = useShifts(props.shifts);
 
 const setWeek = (weekAmount: number) => {
     const newDate = new Date(weekFormatted.value);
@@ -49,6 +49,7 @@ const setWeek = (weekAmount: number) => {
         <div class="space-y-10 p-6">
             <div v-if="canCreateShifts" class="flex flex-1 justify-end">
                 <Button :disabled="hasChanged">Publish</Button>
+                <Button :disabled="hasChanged" class="ml-2" variant="secondary" @click="handleCancel">Cancel</Button>
             </div>
 
             <div class="flex w-full justify-center gap-x-5 pr-4">
@@ -56,8 +57,7 @@ const setWeek = (weekAmount: number) => {
                 <WeekPicker :initial-date="weekFormatted" />
                 <ArrowButton :on-press="() => setWeek(+7)" />
             </div>
-
-            <AppTable :columns="shiftColumns" :data="currentShifts" :editable="canCreateShifts" @update-cell="handleCellUpdate" />
+            <AppTable :columns="shiftColumns" :data="props.shifts" :is-editable="canCreateShifts" @update-cell="handleCellUpdate" />
         </div>
     </AppLayout>
 </template>

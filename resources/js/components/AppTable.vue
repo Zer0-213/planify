@@ -1,12 +1,13 @@
 <script generic="TData, TValue" lang="ts" setup>
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { UpdateTable } from '@/types/updateTable';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
-    editable?: boolean;
+    isEditable?: boolean;
 }>();
 
 const table = useVueTable({
@@ -18,6 +19,10 @@ const table = useVueTable({
     },
     getCoreRowModel: getCoreRowModel(),
 });
+
+const emit = defineEmits<{
+    (e: 'update-cell', data: UpdateTable): void;
+}>();
 </script>
 
 <template>
@@ -33,7 +38,25 @@ const table = useVueTable({
             <TableBody>
                 <template v-if="table.getRowModel().rows?.length">
                     <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined">
-                        <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" :contenteditable="editable">
+                        <TableCell
+                            v-for="cell in row.getVisibleCells()"
+                            :key="cell.id"
+                            :contenteditable="isEditable ?? false"
+                            @input="
+                                (event: Event) => {
+                                    const target = event.target as HTMLTableCellElement;
+                                    const newValue = target.innerText;
+                                    const columnId = cell.column.id;
+                                    const rowIndex = cell.row.index;
+
+                                    emit('update-cell', {
+                                        columnId,
+                                        value: newValue,
+                                        rowIndex,
+                                    });
+                                }
+                            "
+                        >
                             {{ cell.getValue() }}
                         </TableCell>
                     </TableRow>

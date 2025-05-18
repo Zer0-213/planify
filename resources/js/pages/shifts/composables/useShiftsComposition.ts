@@ -1,4 +1,5 @@
 import { ShiftRow } from '@/pages/shifts/table/columns';
+import { UpdateTable } from '@/types/updateTable';
 import { isEqual } from 'lodash';
 import { computed, ref } from 'vue';
 
@@ -7,18 +8,23 @@ export function useShifts(initialShifts: ShiftRow[]) {
 
     const hasChanged = computed(() => isEqual(initialShifts, currentShifts.value));
 
-    const handleCellUpdate = ({ rowIndex, columnId, value }: { rowIndex: number; columnId: string; value: string }) => {
+    const handleCellUpdate = (newData: UpdateTable) => {
+        const { rowIndex, columnId, value } = newData;
         const updatedShifts = [...currentShifts.value];
         updatedShifts[rowIndex] = {
             ...updatedShifts[rowIndex],
-            [columnId]: value,
+            [columnId]: value?.trim(),
         };
         currentShifts.value = updatedShifts;
     };
 
+    const handleCancel = () => {
+        currentShifts.value = [...initialShifts];
+    };
+
     return {
-        currentShifts,
         hasChanged,
         handleCellUpdate,
+        handleCancel,
     };
 }
