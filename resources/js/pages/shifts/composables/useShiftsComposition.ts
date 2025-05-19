@@ -1,22 +1,17 @@
 import { ShiftRow } from '@/pages/shifts/table/columns';
-import { UpdateTable } from '@/types/updateTable';
 import { isEqual } from 'lodash';
 import { computed, ref } from 'vue';
 
 export function useShifts(initialShifts: ShiftRow[]) {
     const currentShifts = ref<ShiftRow[]>([...initialShifts]);
 
+    const handleShiftChange = (rowIndex: number, columnId: string, value: string) => {
+        currentShifts.value[rowIndex][columnId] = value;
+    };
+
     const hasChanged = computed(() => isEqual(initialShifts, currentShifts.value));
 
-    const handleCellUpdate = (newData: UpdateTable) => {
-        const { rowIndex, columnId, value } = newData;
-        const updatedShifts = [...currentShifts.value];
-        updatedShifts[rowIndex] = {
-            ...updatedShifts[rowIndex],
-            [columnId]: value?.trim(),
-        };
-        currentShifts.value = updatedShifts;
-    };
+    const selectedShift = ref<{ rowIndex: number; columnId: string } | null>(null);
 
     const handleCancel = () => {
         currentShifts.value = [...initialShifts];
@@ -24,7 +19,8 @@ export function useShifts(initialShifts: ShiftRow[]) {
 
     return {
         hasChanged,
-        handleCellUpdate,
         handleCancel,
+        selectedShift,
+        handleShiftChange,
     };
 }

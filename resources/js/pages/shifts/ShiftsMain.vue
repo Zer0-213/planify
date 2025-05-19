@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import AppTable from '@/components/AppTable.vue';
 import { ArrowButton, Button } from '@/components/ui/button';
 import { WeekPicker } from '@/components/ui/week-picker';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { useShifts } from '@/pages/shifts/composables/useShiftsComposition';
-import { shiftColumns, ShiftRow } from '@/pages/shifts/table/columns';
+import ShiftSection from '@/pages/shifts/partials/ShiftSection.vue';
+import { ShiftRow } from '@/pages/shifts/table/columns';
 import type { BreadcrumbItem } from '@/types';
 import { router, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
@@ -27,7 +27,19 @@ const props = defineProps<{
 
 const weekFormatted = ref(new Date(props.week));
 
-const { hasChanged, handleCellUpdate, handleCancel } = useShifts(props.shifts);
+const { hasChanged, handleCancel, selectedShift, handleShiftChange } = useShifts(props.shifts);
+
+const emit = defineEmits<{
+    (
+        e: 'shift-change',
+        shift: {
+            index: number;
+            day: string;
+            startTime: string;
+            endTime: string;
+        },
+    ): void;
+}>();
 
 const setWeek = (weekAmount: number) => {
     const newDate = new Date(weekFormatted.value);
@@ -57,7 +69,7 @@ const setWeek = (weekAmount: number) => {
                 <WeekPicker :initial-date="weekFormatted" />
                 <ArrowButton :on-press="() => setWeek(+7)" />
             </div>
-            <AppTable :columns="shiftColumns" :data="props.shifts" :is-editable="canCreateShifts" @update-cell="handleCellUpdate" />
+            <ShiftSection :can-create-shifts="canCreateShifts" :shifts="shifts" />
         </div>
     </AppLayout>
 </template>

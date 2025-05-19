@@ -1,32 +1,24 @@
-<script generic="TData, TValue" lang="ts" setup>
+<script lang="ts" setup>
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import type { ColumnDef } from '@tanstack/vue-table';
+import { columns, ShiftRow } from '@/pages/shifts/table/columns';
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
-import { defineEmits, defineProps } from 'vue';
+import { defineProps } from 'vue';
 
 const props = defineProps<{
-    columns: ColumnDef<TData, TValue>[];
-    data: TData[];
+    shifts: ShiftRow[];
+    canCreateShifts: boolean;
 }>();
 
 const table = useVueTable({
     get data() {
-        return props.data;
+        return props.shifts;
     },
-    get columns() {
-        return props.columns;
-    },
+    columns,
     getCoreRowModel: getCoreRowModel(),
 });
 
 const emit = defineEmits<{
-    (
-        e: 'cell-selected',
-        cell: {
-            columnId: string;
-            rowIndex: number;
-        },
-    ): void;
+    (e: 'cell-selected', cell: { columnId: string; rowIndex: number }): void;
 }>();
 </script>
 
@@ -52,10 +44,12 @@ const emit = defineEmits<{
                             :key="cell.id"
                             @click="
                                 () => {
-                                    emit('cell-selected', {
-                                        columnId: cell.column.id,
-                                        rowIndex: index,
-                                    });
+                                    if (props.canCreateShifts && !cell.column.id.includes('name')) {
+                                        emit('cell-selected', {
+                                            columnId: cell.column.id,
+                                            rowIndex: index,
+                                        });
+                                    }
                                 }
                             "
                         >
@@ -63,12 +57,9 @@ const emit = defineEmits<{
                         </TableCell>
                     </TableRow>
                 </template>
-                <template v-else>
-                    <TableRow>
-                        <TableCell :colspan="columns.length" class="h-24 text-center"> No results.</TableCell>
-                    </TableRow>
-                </template>
             </TableBody>
         </Table>
     </div>
 </template>
+
+<style scoped></style>

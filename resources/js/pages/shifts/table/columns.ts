@@ -1,49 +1,43 @@
-import type { ColumnDef } from '@tanstack/vue-table';
+import { createColumnHelper } from '@tanstack/vue-table';
 
-type NullableString = string | null;
+type NullableDate = Date | null;
 
 export type ShiftRow = {
-    name: NullableString;
-    monday: NullableString;
-    tuesday: NullableString;
-    wednesday: NullableString;
-    thursday: NullableString;
-    friday: NullableString;
-    saturday: NullableString;
-    sunday: NullableString;
+    name: NullableDate;
+    monday: NullableDate;
+    tuesday: NullableDate;
+    wednesday: NullableDate;
+    thursday: NullableDate;
+    friday: NullableDate;
+    saturday: NullableDate;
+    sunday: NullableDate;
 };
 
-export const shiftColumns: ColumnDef<ShiftRow>[] = [
-    {
-        accessorKey: 'name',
+const columnHelper = createColumnHelper<ShiftRow>();
+
+export const columns = [
+    columnHelper.accessor('name', {
         header: 'Name',
-    },
-    {
-        accessorKey: 'monday',
+    }),
+    columnHelper.accessor('monday', {
         header: 'Monday',
-    },
-    {
-        accessorKey: 'tuesday',
+    }),
+    columnHelper.accessor('tuesday', {
         header: 'Tuesday',
-    },
-    {
-        accessorKey: 'wednesday',
+    }),
+    columnHelper.accessor('wednesday', {
         header: 'Wednesday',
-    },
-    {
-        accessorKey: 'thursday',
+    }),
+    columnHelper.accessor('thursday', {
         header: 'Thursday',
-    },
-    {
-        accessorKey: 'friday',
+    }),
+    columnHelper.accessor('friday', {
         header: 'Friday',
-    },
-    {
-        accessorKey: 'saturday',
+    }),
+    columnHelper.accessor('saturday', {
         header: 'Saturday',
-    },
-    {
-        accessorKey: 'sunday',
+    }),
+    columnHelper.accessor('sunday', {
         header: 'Sunday',
-    },
+    }),
 ];
