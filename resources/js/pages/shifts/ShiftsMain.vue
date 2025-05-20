@@ -2,54 +2,33 @@
 import { ArrowButton, Button } from '@/components/ui/button';
 import { WeekPicker } from '@/components/ui/week-picker';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { useShifts } from '@/pages/shifts/composables/useShiftsComposition';
-import ShiftSection from '@/pages/shifts/partials/ShiftSection.vue';
-import { ShiftRow } from '@/pages/shifts/table/columns';
-import type { BreadcrumbItem } from '@/types';
+import { useShiftsComposition } from '@/pages/shifts/composables/useShiftsComposition';
+import ShiftEditorDialog from '@/pages/shifts/partials/ShiftEditorDialog.vue';
+import { ShiftData } from '@/pages/shifts/types/ShiftData';
 import { router, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
-import { defineProps, ref } from 'vue';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Shift',
-        href: '/shifts',
-    },
-];
-
-const permissions = (usePage().props.auth as { permissions: string[] }).permissions;
-const canCreateShifts = permissions?.includes('create_shifts');
+import { ref } from 'vue';
+import ShiftTable from './table/ShiftsTable.vue';
 
 const props = defineProps<{
-    shifts: ShiftRow[];
+    shifts: ShiftData[];
     week: string;
 }>();
+const permissions = usePage().props?.auth?.permissions as string[];
+const canCreateShifts = permissions.includes('create_shifts');
+
+const breadcrumbs = [{ title: 'Shift', href: '/shifts' }];
 
 const weekFormatted = ref(new Date(props.week));
+const { shifts, selectedShift, hasChanged, resetShifts, updateShift } = useShiftsComposition(props.shifts);
 
-const { hasChanged, handleCancel, selectedShift, handleShiftChange } = useShifts(props.shifts);
-
-const emit = defineEmits<{
-    (
-        e: 'shift-change',
-        shift: {
-            index: number;
-            day: string;
-            startTime: string;
-            endTime: string;
-        },
-    ): void;
-}>();
-
-const setWeek = (weekAmount: number) => {
+const setWeek = (delta: number) => {
     const newDate = new Date(weekFormatted.value);
-    newDate.setDate(newDate.getDate() + weekAmount);
+    newDate.setDate(newDate.getDate() + delta);
     weekFormatted.value = newDate;
 
     router.visit('/shifts', {
-        data: {
-            week: format(newDate, 'yyyy-MM-dd'),
-        },
+        data: { week: format(newDate, 'yyyy-MM-dd') },
         preserveState: true,
         preserveScroll: true,
     });
@@ -58,20 +37,20 @@ const setWeek = (weekAmount: number) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="space-y-10 p-6">
-            <div v-if="canCreateShifts" class="flex flex-1 justify-end">
-                <Button :disabled="hasChanged">Publish</Button>
-                <Button :disabled="hasChanged" class="ml-2" variant="secondary" @click="handleCancel">Cancel</Button>
+        <div class="space-y-8 p-6">
+            <div class="flex justify-end">
+                <Button :disabled="!hasChanged">Publish</Button>
+                <Button :disabled="!hasChanged" class="ml-2" variant="secondary" @click="resetShifts">Cancel</Button>
             </div>
 
-            <div class="flex w-full justify-center gap-x-5 pr-4">
-                <ArrowButton :on-press="() => setWeek(-7)" direction="left" />
+            <div class="flex items-center justify-center gap-4">
+                <ArrowButton direction="left" @click="() => setWeek(-7)" />
                 <WeekPicker :initial-date="weekFormatted" />
-                <ArrowButton :on-press="() => setWeek(+7)" />
+                <ArrowButton direction="right" @click="() => setWeek(7)" />
             </div>
-            <ShiftSection :can-create-shifts="canCreateShifts" :shifts="shifts" />
+
+            <ShiftTable :can-create-shifts="canCreateShifts" :shifts="shifts" @cell-selected="(cell) => (selectedShift = cell)" />
+            <ShiftEditorDialog v-model:shift="selectedShift" @save="updateShift" />
         </div>
     </AppLayout>
 </template>
-
-<style scoped></style>

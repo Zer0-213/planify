@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { columns, ShiftRow } from '@/pages/shifts/table/columns';
+import { columns } from '@/pages/shifts/table/columns';
+import { ShiftData } from '@/pages/shifts/types/ShiftData';
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
 import { defineProps } from 'vue';
 
 const props = defineProps<{
-    shifts: ShiftRow[];
+    shifts: ShiftData[];
     canCreateShifts: boolean;
 }>();
 
@@ -16,6 +17,16 @@ const table = useVueTable({
     columns,
     getCoreRowModel: getCoreRowModel(),
 });
+
+// watch(props.shifts, (val) => {
+//     table = useVueTable({
+//         get data() {
+//             return val;
+//         },
+//         columns,
+//         getCoreRowModel: getCoreRowModel(),
+//     });
+// });
 
 const emit = defineEmits<{
     (e: 'cell-selected', cell: { columnId: string; rowIndex: number }): void;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\GetCompanyShiftsForWeek;
+use App\Actions\GetCompanyShiftsForWeekAction;
 use App\Models\Company;
 use App\Models\User;
 use Carbon\CarbonInterface;
@@ -13,7 +13,7 @@ use Inertia\Response;
 
 class ShiftsController extends Controller
 {
-    public function index(Request $request, GetCompanyShiftsForWeek $getCompanyShiftsForWeek): Response
+    public function index(Request $request, GetCompanyShiftsForWeekAction $getCompanyShiftsForWeek): Response
     {
         /** @var User $user */
         $user = auth()->user();

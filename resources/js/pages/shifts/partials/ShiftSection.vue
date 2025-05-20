@@ -4,21 +4,29 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import ShiftsTable from '@/pages/shifts/table/ShiftsTable.vue';
-import type { ShiftRow } from '@/pages/shifts/table/columns';
+import { ShiftData } from '@/pages/shifts/types/ShiftData';
+import { UpdateShift } from '@/pages/shifts/types/updateShift';
 import { ref, watch } from 'vue';
 
 defineProps<{
     canCreateShifts: boolean;
-    shifts: ShiftRow[];
+    shifts: ShiftData[];
 }>();
 
 const emit = defineEmits<{
-    (e: 'update:selectedShift', value: any): void;
+    (e: 'update-selected-shift', value: UpdateShift): void;
 }>();
 
 const selectedShift = ref<any>(null);
+const startTime = ref('08:00');
+const endTime = ref('17:00');
 
-watch(selectedShift, (val) => emit('update:selectedShift', val));
+watch(selectedShift, (val) => {
+    if (val) {
+        startTime.value = '08:00';
+        endTime.value = '17:00';
+    }
+});
 </script>
 
 <template>
@@ -37,16 +45,31 @@ watch(selectedShift, (val) => emit('update:selectedShift', val));
                     </div>
                     <div class="flex flex-col gap-y-1">
                         <Label>Start Time</Label>
-                        <Input type="time" />
+                        <Input v-model="startTime" type="time" />
                     </div>
                     <div class="flex flex-col gap-y-1">
                         <Label>End Time</Label>
-                        <Input type="time" />
+                        <Input v-model="endTime" type="time" />
                     </div>
                 </div>
 
                 <DialogFooter class="sm:justify-start">
-                    <Button class="w-full" type="button" @click="() => {}">Save</Button>
+                    <Button
+                        class="w-full"
+                        type="button"
+                        @click="
+                            () => {
+                                emit('update-selected-shift', {
+                                    userIndex: selectedShift.rowIndex,
+                                    day: selectedShift.columnId,
+                                    start: startTime,
+                                    end: endTime,
+                                });
+                                selectedShift = null;
+                            }
+                        "
+                        >Save
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

@@ -1,26 +1,55 @@
-import { ShiftRow } from '@/pages/shifts/table/columns';
+// composables/useShifts.ts
+import { ShiftData } from '@/pages/shifts/types/ShiftData';
+import { UpdateShift } from '@/pages/shifts/types/updateShift';
+import { WeekDay } from '@/pages/shifts/types/weekday';
 import { isEqual } from 'lodash';
-import { computed, ref } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 
-export function useShifts(initialShifts: ShiftRow[]) {
-    const currentShifts = ref<ShiftRow[]>([...initialShifts]);
-
-    const handleShiftChange = (rowIndex: number, columnId: string, value: string) => {
-        currentShifts.value[rowIndex][columnId] = value;
-    };
-
-    const hasChanged = computed(() => isEqual(initialShifts, currentShifts.value));
-
+export function useShiftsComposition(initial: ShiftData[]) {
+    const shifts = ref<ShiftData[]>(structuredClone(toRaw(initial)));
     const selectedShift = ref<{ rowIndex: number; columnId: string } | null>(null);
 
-    const handleCancel = () => {
-        currentShifts.value = [...initialShifts];
+    const hasChanged = computed(() => !isEqual(initial, shifts.value));
+
+    const resetShifts = () => {
+        shifts.value = structuredClone(toRaw(initial));
+    };
+
+    const updateShift = (update: UpdateShift) => {
+        const { userIndex, day, start, end } = update;
+        const dayKey = day.toLowerCase() as WeekDay;
+
+        const existingShift = shifts.value[userIndex].shifts[dayKey];
+
+        if (!existingShift || !start || !end) return;
+
+        const updatedShift = {
+            ...existingShift,
+            starts_at: combineDateTime(existingShift.date, start),
+            ends_at: combineDateTime(existingShift.date, end),
+        };
+
+        shifts.value[userIndex] = {
+            ...shifts.value[userIndex],
+            shifts: {
+                ...shifts.value[userIndex].shifts,
+                [dayKey]: updatedShift,
+            },
+        };
+    };
+
+    const combineDateTime = (dateStr: string, timeStr: string): string => {
+        const [h, m] = timeStr.split(':').map(Number);
+        const date = new Date(dateStr);
+        date.setHours(h, m, 0, 0);
+        return date.toISOString();
     };
 
     return {
-        hasChanged,
-        handleCancel,
+        shifts,
         selectedShift,
-        handleShiftChange,
+        hasChanged,
+        resetShifts,
+        updateShift,
     };
 }
