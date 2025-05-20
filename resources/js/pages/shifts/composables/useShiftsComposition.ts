@@ -23,19 +23,13 @@ export function useShiftsComposition(initial: ShiftData[]) {
 
         if (!existingShift || !start || !end) return;
 
-        const updatedShift = {
+        shifts.value[userIndex].shifts[dayKey] = {
             ...existingShift,
             starts_at: combineDateTime(existingShift.date, start),
             ends_at: combineDateTime(existingShift.date, end),
         };
 
-        shifts.value[userIndex] = {
-            ...shifts.value[userIndex],
-            shifts: {
-                ...shifts.value[userIndex].shifts,
-                [dayKey]: updatedShift,
-            },
-        };
+        shifts.value = [...shifts.value];
     };
 
     const combineDateTime = (dateStr: string, timeStr: string): string => {

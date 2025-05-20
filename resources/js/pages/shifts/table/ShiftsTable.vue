@@ -18,16 +18,6 @@ const table = useVueTable({
     getCoreRowModel: getCoreRowModel(),
 });
 
-// watch(props.shifts, (val) => {
-//     table = useVueTable({
-//         get data() {
-//             return val;
-//         },
-//         columns,
-//         getCoreRowModel: getCoreRowModel(),
-//     });
-// });
-
 const emit = defineEmits<{
     (e: 'cell-selected', cell: { columnId: string; rowIndex: number }): void;
 }>();
@@ -64,7 +54,7 @@ const emit = defineEmits<{
                                 }
                             "
                         >
-                            {{ cell.getValue() }}
+                            <FlexRender :props="cell.getContext()" :render="cell.column.columnDef.cell" />
                         </TableCell>
                     </TableRow>
                 </template>
