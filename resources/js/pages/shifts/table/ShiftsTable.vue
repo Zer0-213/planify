@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { columns } from '@/pages/shifts/table/columns';
+import { createShiftColumns } from '@/pages/shifts/table/columns';
+import { Shift } from '@/pages/shifts/types/Shift';
 import { ShiftData } from '@/pages/shifts/types/ShiftData';
+import { WeekDay } from '@/pages/shifts/types/weekday';
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
 import { defineProps } from 'vue';
 
@@ -10,6 +12,30 @@ const props = defineProps<{
     canCreateShifts: boolean;
 }>();
 
+const emit = defineEmits<{
+    (e: 'update-shift', updated: ShiftData): void;
+}>();
+
+function handleShiftUpdate(userId: number, day: WeekDay, updates: Partial<Shift>) {
+    const row = props.shifts.find((shift) => shift.user_id === userId);
+    if (!row) return;
+
+    const updated: ShiftData = {
+        ...row,
+        shifts: {
+            ...row.shifts,
+            [day]: {
+                ...row.shifts[day],
+                ...updates,
+            },
+        },
+    };
+
+    emit('update-shift', updated);
+}
+
+const columns = createShiftColumns({ onShiftUpdate: handleShiftUpdate, canEditShifts: props.canCreateShifts });
+
 const table = useVueTable({
     get data() {
         return props.shifts;
@@ -17,10 +43,6 @@ const table = useVueTable({
     columns,
     getCoreRowModel: getCoreRowModel(),
 });
-
-const emit = defineEmits<{
-    (e: 'cell-selected', cell: { columnId: string; rowIndex: number }): void;
-}>();
 </script>
 
 <template>
@@ -28,32 +50,15 @@ const emit = defineEmits<{
         <Table>
             <TableHeader>
                 <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                    <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                    <TableHead v-for="header in headerGroup.headers" :key="header.id" class="text-center">
                         <FlexRender v-if="!header.isPlaceholder" :props="header.getContext()" :render="header.column.columnDef.header" />
                     </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 <template v-if="table.getRowModel().rows?.length">
-                    <TableRow
-                        v-for="(row, index) in table.getRowModel().rows"
-                        :key="row.id"
-                        :data-state="row.getIsSelected() ? 'selected' : undefined"
-                    >
-                        <TableCell
-                            v-for="cell in row.getVisibleCells()"
-                            :key="cell.id"
-                            @click="
-                                () => {
-                                    if (props.canCreateShifts && !cell.column.id.includes('name')) {
-                                        emit('cell-selected', {
-                                            columnId: cell.column.id,
-                                            rowIndex: index,
-                                        });
-                                    }
-                                }
-                            "
-                        >
+                    <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() ? 'selected' : undefined">
+                        <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                             <FlexRender :props="cell.getContext()" :render="cell.column.columnDef.cell" />
                         </TableCell>
                     </TableRow>

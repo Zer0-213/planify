@@ -3,7 +3,6 @@ import { ArrowButton, Button } from '@/components/ui/button';
 import { WeekPicker } from '@/components/ui/week-picker';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { useShiftsComposition } from '@/pages/shifts/composables/useShiftsComposition';
-import ShiftEditorDialog from '@/pages/shifts/partials/ShiftEditorDialog.vue';
 import { ShiftData } from '@/pages/shifts/types/ShiftData';
 import { router, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
@@ -20,7 +19,7 @@ const canCreateShifts = permissions.includes('create_shifts');
 const breadcrumbs = [{ title: 'Shift', href: '/shifts' }];
 
 const weekFormatted = ref(new Date(props.week));
-const { shifts, selectedShift, hasChanged, resetShifts, updateShift } = useShiftsComposition(props.shifts);
+const { shifts, hasChanged, resetShifts, updateShiftTime } = useShiftsComposition(props.shifts);
 
 const setWeek = (delta: number) => {
     const newDate = new Date(weekFormatted.value);
@@ -49,8 +48,7 @@ const setWeek = (delta: number) => {
                 <ArrowButton direction="right" @click="() => setWeek(7)" />
             </div>
 
-            <ShiftTable :can-create-shifts="canCreateShifts" :shifts="shifts" @cell-selected="(cell) => (selectedShift = cell)" />
-            <ShiftEditorDialog v-model:shift="selectedShift" @save="updateShift" />
+            <ShiftTable :can-create-shifts="canCreateShifts" :shifts="shifts" @update-shift="(shift) => updateShiftTime(shift)" />
         </div>
     </AppLayout>
 </template>
