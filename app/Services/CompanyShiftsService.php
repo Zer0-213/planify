@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Actions;
+namespace App\Services;
 
 use App\Models\Company;
+use App\Models\Shift;
 use Carbon\Carbon;
 
-class GetCompanyShiftsForWeekAction
+class CompanyShiftsService
 {
-    public function execute(Company $company, Carbon $startWeek, Carbon $endWeek): array
+    public function getShiftsForWeek(Company $company, Carbon $startWeek, Carbon $endWeek): array
     {
 
         return $company->companyUsers()
@@ -51,5 +52,34 @@ class GetCompanyShiftsForWeekAction
             'starts_at' => $shift?->starts_at,
             'ends_at' => $shift?->ends_at,
         ];
+    }
+
+    public function upsertShifts(array $shifts, Shift $shiftModel, Company $company): void
+    {
+        $upserts = [];
+
+        foreach ($shifts as $shift) {
+            $companyUser = $company->companyUsers()->where('user_id', $shift['user_id'])->first();
+
+            foreach ($shift['shifts'] as $day => $shiftData) {
+                if (empty($shiftData['starts_at'] || empty($shiftData['ends_at']))) {
+                    continue;
+                }
+
+                $entry = [
+                    'company_user_id' => $companyUser->id,
+                    'starts_at' => $shiftData['starts_at'],
+                    'ends_at' => $shiftData['ends_at']
+                ];
+
+                if (isset($shiftData['id'])) {
+                    $entry['id'] = $shiftData['id'];
+                }
+
+                $upserts[] = $entry;
+            }
+        }
+
+        $shiftModel->upsert($upserts, 'id', ['starts_at', 'ends_at']);
     }
 }

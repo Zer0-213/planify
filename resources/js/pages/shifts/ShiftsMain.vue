@@ -38,7 +38,7 @@ const setWeek = (delta: number) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="space-y-8 p-6">
             <div class="flex justify-end">
-                <Button :disabled="!hasChanged">Publish</Button>
+                <Button :disabled="!hasChanged" @click="() => console.log(shifts)">Publish</Button>
                 <Button :disabled="!hasChanged" class="ml-2" variant="secondary" @click="resetShifts">Cancel</Button>
             </div>
 
