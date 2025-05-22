@@ -67,19 +67,17 @@ class CompanyShiftsService
                 }
 
                 $entry = [
+                    'id' => $shiftData['id'] ?? null,
                     'company_user_id' => $companyUser->id,
                     'starts_at' => $shiftData['starts_at'],
                     'ends_at' => $shiftData['ends_at']
                 ];
 
-                if (isset($shiftData['id'])) {
-                    $entry['id'] = $shiftData['id'];
-                }
 
                 $upserts[] = $entry;
             }
         }
 
-        $shiftModel->upsert($upserts, 'id', ['starts_at', 'ends_at']);
+        $shiftModel->upsert($upserts, ['id'], ['starts_at', 'ends_at']);
     }
 }
