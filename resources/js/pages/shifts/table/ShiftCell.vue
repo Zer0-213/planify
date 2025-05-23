@@ -15,7 +15,6 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: 'updateTime', payload: TimeUpdatePayload): void;
 }>();
-
 const { localStart, localEnd } = useShiftTime(props.startTime, props.endTime, props.disabled, (payload) => emit('updateTime', payload));
 
 const inputClass = computed(() => 'w-fit cursor-pointer border-0 bg-transparent p-0 text-center shadow-none');

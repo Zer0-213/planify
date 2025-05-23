@@ -10,7 +10,6 @@ class CompanyShiftsService
 {
     public function getShiftsForWeek(Company $company, Carbon $startWeek, Carbon $endWeek): array
     {
-
         return $company->companyUsers()
             ->with([
                 'user',
@@ -41,7 +40,8 @@ class CompanyShiftsService
                     'user_id' => $companyUser->user->id,
                     'shifts' => $shiftData,
                 ];
-            })->toArray();
+            })
+            ->toArray();
     }
 
     private function formatShift(?object $shift, Carbon $date): ?array
@@ -49,32 +49,32 @@ class CompanyShiftsService
         return [
             'id' => $shift?->id,
             'date' => $date->format('Y-m-d'),
-            'starts_at' => $shift?->starts_at,
-            'ends_at' => $shift?->ends_at,
+            'starts_at' => $shift?->starts_at?->toIso8601String(),
+            'ends_at' => $shift?->ends_at?->toIso8601String(),
         ];
     }
 
     public function upsertShifts(array $shifts, Shift $shiftModel, Company $company): void
     {
+        $timezone = config('app.timezone');
         $upserts = [];
 
         foreach ($shifts as $shift) {
             $companyUser = $company->companyUsers()->where('user_id', $shift['user_id'])->first();
 
-            foreach ($shift['shifts'] as $day => $shiftData) {
-                if (empty($shiftData['starts_at'] || empty($shiftData['ends_at']))) {
+            foreach ($shift['shifts'] as $shiftData) {
+                if (empty($shiftData['starts_at'])) {
                     continue;
                 }
 
-                $entry = [
+                $upserts[] = [
                     'id' => $shiftData['id'] ?? null,
                     'company_user_id' => $companyUser->id,
-                    'starts_at' => $shiftData['starts_at'],
+                    'starts_at' => Carbon::parse($shiftData['starts_at'], $timezone)->toDateTimeString(),
                     'ends_at' => $shiftData['ends_at']
+                        ? Carbon::parse($shiftData['ends_at'], $timezone)->toDateTimeString()
+                        : null,
                 ];
-
-
-                $upserts[] = $entry;
             }
         }
 

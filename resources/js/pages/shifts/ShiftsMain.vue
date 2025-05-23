@@ -7,6 +7,7 @@ import { ShiftData } from '@/pages/shifts/types/ShiftData';
 import { router, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 import ShiftTable from './table/ShiftsTable.vue';
 
 const props = defineProps<{
@@ -32,13 +33,31 @@ const setWeek = (delta: number) => {
         preserveScroll: true,
     });
 };
+
+const publishShifts = () => {
+    console.log(shifts);
+    return;
+    router.post(
+        '/shifts',
+        {
+            shifts: shifts.value,
+            week: format(weekFormatted.value, 'yyyy-MM-dd'),
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Shifts saved successfully');
+            },
+        },
+    );
+};
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="space-y-8 p-6">
             <div class="flex justify-end">
-                <Button :disabled="!hasChanged" @click="() => console.log(shifts)">Publish</Button>
+                <Button :disabled="!hasChanged" @click="publishShifts">Publish</Button>
                 <Button :disabled="!hasChanged" class="ml-2" variant="secondary" @click="resetShifts">Cancel</Button>
             </div>
 

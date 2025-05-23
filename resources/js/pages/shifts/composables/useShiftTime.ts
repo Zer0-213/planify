@@ -11,10 +11,19 @@ export function useShiftTime(startTime: string, endTime: string, disabled: boole
         if (!timeString || disabled) return;
 
         const [hours, minutes] = timeString.split(':').map(Number);
-        const newDate = originalDate ? new Date(originalDate) : new Date();
 
-        newDate.setHours(hours);
-        newDate.setMinutes(minutes);
+        // If we have an original date, use it to preserve the date part
+        // Otherwise create a new date
+        let newDate;
+        if (originalDate) {
+            newDate = new Date(originalDate);
+            // Only update the time portion
+            newDate.setHours(hours, minutes, 0, 0);
+        } else {
+            // If no original date, we need to create one
+            newDate = new Date();
+            newDate.setHours(hours, minutes, 0, 0);
+        }
 
         emit({ [timeField]: newDate.toISOString() });
     };

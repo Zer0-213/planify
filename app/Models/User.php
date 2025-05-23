@@ -130,6 +130,22 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * Check if the user has a specific permission in a specific company.
+     *
+     * @param string $permission The permission slugs to check for
+     * @param int $companyId The company ID to check in
+     * @return bool
+     */
+    public function hasPermissionInCompany(string $permission, int $companyId): bool
+    {
+        return $this->permissions()
+            ->where('name', $permission)
+            ->wherePivot('company_id', $companyId)
+            ->exists();
+    }
+
+
     // ─────────────────────────────────────
     // Custom Logic
     // ─────────────────────────────────────

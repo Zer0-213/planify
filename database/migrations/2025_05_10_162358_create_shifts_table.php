@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->timestamps();
             $table->foreignId('company_user_id')->constrained()->onDelete('cascade');
             $table->datetime('starts_at');
-            $table->datetime('ends_at');
+            $table->datetime('ends_at')->nullable();
             $table->integer('break_duration')->nullable(); // Duration in minutes
             $table->text('notes')->nullable();
             $table->foreignId('role_id')->nullable()->constrained()->onDelete('set null');

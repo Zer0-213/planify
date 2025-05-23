@@ -7,7 +7,7 @@ export function useShiftsComposition(initial: ShiftData[]) {
     const shifts = ref<ShiftData[]>(structuredClone(toRaw(initial)));
 
     const hasChanged = computed(() => !isEqual(initial, shifts.value));
-    
+
     const resetShifts = () => {
         shifts.value = structuredClone(toRaw(initial));
     };
