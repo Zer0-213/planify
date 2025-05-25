@@ -19,6 +19,11 @@ const mainNavItems: NavItem[] = [
         href: '/shifts',
         icon: LayoutGrid,
     },
+    {
+        title: 'Staff',
+        href: '/staff',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
