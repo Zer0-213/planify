@@ -17,6 +17,7 @@ class Shift extends Model
     protected $fillable = [
         'company_user_id',
         'role_id',
+        'shift_date',
         'starts_at',
         'ends_at',
         'break_duration',
@@ -28,6 +29,7 @@ class Shift extends Model
     protected $casts = [
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'shift_date' => 'date',
         'break_duration' => 'integer',
     ];
 

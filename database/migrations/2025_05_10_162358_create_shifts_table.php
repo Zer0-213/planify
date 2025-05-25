@@ -14,7 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->timestamps();
             $table->foreignId('company_user_id')->constrained()->onDelete('cascade');
-            $table->datetime('starts_at');
+            $table->date('shift_date');
+            $table->datetime('starts_at')->nullable();
             $table->datetime('ends_at')->nullable();
             $table->integer('break_duration')->nullable(); // Duration in minutes
             $table->text('notes')->nullable();

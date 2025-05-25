@@ -14,45 +14,31 @@ class CompanyShiftsService
             ->with([
                 'user',
                 'shifts' => function ($query) use ($startWeek, $endWeek) {
-                    $query->whereBetween('starts_at', [
+                    $query->whereBetween('shift_date', [
                         $startWeek->copy()->startOfDay(),
                         $endWeek->copy()->endOfDay()
                     ]);
                 }
             ])
             ->get()
-            ->map(function ($companyUser) use ($startWeek) {
-                $shifts = $companyUser->shifts->groupBy(function ($shift) {
-                    return strtolower(Carbon::parse($shift->starts_at)->format('l'));
-                });
-
-                $shiftData = [];
-
-                $weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-                foreach ($weekdays as $index => $day) {
-                    $date = $startWeek->copy()->startOfWeek()->addDays($index);
-                    $shift = $shifts->get($day)?->first();
-                    $shiftData[$day] = $this->formatShift($shift, $date);
-                }
-
+            ->map(function ($companyUser) {
                 return [
-                    'name' => $companyUser->user->name,
                     'user_id' => $companyUser->user->id,
-                    'shifts' => $shiftData,
+                    'name' => $companyUser->user->name,
+                    'shifts' => $companyUser->shifts->map(function ($shift) {
+                        return [
+                            'id' => $shift?->id,
+                            'starts_at' => $shift->starts_at?->toIso8601String(),
+                            'ends_at' => $shift->ends_at?->toIso8601String(),
+                            'shift_date' => $shift?->shift_date?->toIso8601String(),
+                            // Optionally: include role, location, etc.
+                        ];
+                    }),
                 ];
             })
             ->toArray();
     }
 
-    private function formatShift(?object $shift, Carbon $date): ?array
-    {
-        return [
-            'id' => $shift?->id,
-            'date' => $date->format('Y-m-d'),
-            'starts_at' => $shift?->starts_at?->toIso8601String(),
-            'ends_at' => $shift?->ends_at?->toIso8601String(),
-        ];
-    }
 
     public function upsertShifts(array $shifts, Shift $shiftModel, Company $company): void
     {
@@ -63,17 +49,16 @@ class CompanyShiftsService
             $companyUser = $company->companyUsers()->where('user_id', $shift['user_id'])->first();
 
             foreach ($shift['shifts'] as $shiftData) {
-                if (empty($shiftData['starts_at'])) {
-                    continue;
-                }
+
+                $startDate = $shiftData['starts_at'] ? Carbon::parse($shiftData['starts_at'], $timezone) : null;
+                $endDate = $shiftData['ends_at'] ? Carbon::parse($shiftData['ends_at'], $timezone)->toDateTimeString() : null;
 
                 $upserts[] = [
                     'id' => $shiftData['id'] ?? null,
                     'company_user_id' => $companyUser->id,
-                    'starts_at' => Carbon::parse($shiftData['starts_at'], $timezone)->toDateTimeString(),
-                    'ends_at' => $shiftData['ends_at']
-                        ? Carbon::parse($shiftData['ends_at'], $timezone)->toDateTimeString()
-                        : null,
+                    'shift_date' => Carbon::parse($shiftData['shift_date'], $timezone)->toDate(),
+                    'starts_at' => $startDate,
+                    'ends_at' => $endDate
                 ];
             }
         }

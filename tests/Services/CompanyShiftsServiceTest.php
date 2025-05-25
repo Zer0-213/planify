@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Shift;
 use App\Models\User;
 use App\Services\CompanyShiftsService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -160,6 +161,92 @@ class CompanyShiftsServiceTest extends TestCase
             'starts_at' => '2023-10-23 10:00:00',
             'ends_at' => '2023-10-23 18:00:00',
         ]);
+    }
+
+    #[Test]
+    public function it_returns_shifts_for_the_specified_week_with_correct_details()
+    {
+        // Arrange
+        $user = User::factory()->create(['name' => 'John Doe']);
+        $company = Company::factory()->create(['owner_id' => $user->id]);
+        $companyUser = $company->companyUsers()->create(['user_id' => $user->id]);
+
+
+        // Or create shifts
+        $shifts = Shift::factory()->createShifts($companyUser, [
+            ['starts_at' => '2023-10-23 08:00:00', 'ends_at' => '2023-10-23 16:00:00'],
+            ['starts_at' => '2023-10-25 09:00:00', 'ends_at' => '2023-10-25 17:00:00'],
+        ]);
+
+
+        $startWeek = Carbon::parse('2023-10-23');
+        $endWeek = Carbon::parse('2023-10-29');
+
+        // Act
+        $result = $this->service->getShiftsForWeek($company, $startWeek, $endWeek);
+
+        // Assert
+        $this->assertCount(1, $result);
+        $this->assertEquals($user->id, $result[0]['user_id']);
+        $this->assertEquals('John Doe', $result[0]['name']);
+        $this->assertCount(2, $result[0]['shifts']);
+        $this->assertEquals('2023-10-23T08:00:00+00:00', $result[0]['shifts'][0]['starts_at']);
+        $this->assertEquals('2023-10-25T09:00:00+00:00', $result[0]['shifts'][1]['starts_at']);
+    }
+
+    #[Test]
+    public function it_handles_empty_shifts_for_week()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $company = Company::factory()->create(['owner_id' => $user->id]);
+        $company->companyUsers()->create(['user_id' => $user->id]);
+
+        $startWeek = Carbon::parse('2023-10-23');
+        $endWeek = Carbon::parse('2023-10-29');
+
+        // Act
+        $result = $this->service->getShiftsForWeek($company, $startWeek, $endWeek);
+
+        // Assert
+        $this->assertEmpty($result);
+    }
+
+    #[Test]
+    public function it_filters_shifts_based_on_week_boundaries()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $company = Company::factory()->create(['owner_id' => $user->id]);
+        $companyUser = $company->companyUsers()->create(['user_id' => $user->id]);
+
+        Shift::factory()->create([
+            'company_user_id' => $companyUser->id,
+            'starts_at' => '2023-10-22 08:00:00', // Outside start of week
+            'ends_at' => '2023-10-22 16:00:00',
+        ]);
+
+        Shift::factory()->create([
+            'company_user_id' => $companyUser->id,
+            'starts_at' => '2023-10-23 08:00:00', // Inside week
+            'ends_at' => '2023-10-23 16:00:00',
+        ]);
+
+        Shift::factory()->create([
+            'company_user_id' => $companyUser->id,
+            'starts_at' => '2023-10-30 08:00:00', // Outside end of week
+            'ends_at' => '2023-10-30 16:00:00',
+        ]);
+
+        $startWeek = Carbon::parse('2023-10-23');
+        $endWeek = Carbon::parse('2023-10-29');
+
+        // Act
+        $result = $this->service->getShiftsForWeek($company, $startWeek, $endWeek);
+
+        // Assert
+        $this->assertCount(1, $result[0]['shifts']);
+        $this->assertEquals('2023-10-23T08:00:00+00:00', $result[0]['shifts'][0]['starts_at']);
     }
 
     protected function setUp(): void

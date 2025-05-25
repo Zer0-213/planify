@@ -1,40 +1,51 @@
 <script lang="ts" setup>
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { createShiftColumns } from '@/pages/shifts/table/columns';
-import { Shift } from '@/pages/shifts/types/Shift';
-import { ShiftData } from '@/pages/shifts/types/ShiftData';
-import { WeekDay } from '@/pages/shifts/types/weekday';
+import { ShiftTime, UserShift } from '@/pages/shifts/types/shiftTypes';
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
-import { defineProps } from 'vue';
 
 const props = defineProps<{
-    shifts: ShiftData[];
+    shifts: UserShift[];
     canCreateShifts: boolean;
+    weekStartDate: string;
 }>();
 
 const emit = defineEmits<{
-    (e: 'update-shift', updated: ShiftData): void;
+    (e: 'update-shift', updated: UserShift): void;
 }>();
 
-function handleShiftUpdate(userId: number, day: WeekDay, updates: Partial<Shift>) {
-    const row = props.shifts.find((shift) => shift.user_id === userId);
-    if (!row) return;
+function handleShiftUpdate(userId: number, updates: Partial<ShiftTime>) {
+    const user = props.shifts.find((shift) => shift.user_id === userId);
+    if (!user) return;
 
-    const updated: ShiftData = {
-        ...row,
-        shifts: {
-            ...row.shifts,
-            [day]: {
-                ...row.shifts[day],
-                ...updates,
-            },
-        },
-    };
+    const existingShiftIndex = user.shifts.findIndex((shift) => shift.id === updates?.id);
+    const updatedShifts = [...user.shifts];
 
-    emit('update-shift', updated);
+    if (existingShiftIndex >= 0) {
+        updatedShifts[existingShiftIndex] = {
+            ...updatedShifts[existingShiftIndex],
+            ...updates,
+        };
+    } else {
+        updatedShifts.push({
+            id: updates?.id || null,
+            starts_at: updates?.starts_at || '',
+            ends_at: updates?.ends_at || '',
+            shift_date: updates?.shift_date || '',
+        });
+    }
+
+    emit('update-shift', {
+        ...user,
+        shifts: updatedShifts,
+    });
 }
 
-const columns = createShiftColumns({ onShiftUpdate: handleShiftUpdate, canEditShifts: props.canCreateShifts });
+const columns = createShiftColumns({
+    onShiftUpdate: handleShiftUpdate,
+    canEditShifts: props.canCreateShifts,
+    weekStartDate: props.weekStartDate,
+});
 
 const table = useVueTable({
     get data() {
