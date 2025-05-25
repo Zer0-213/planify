@@ -1,7 +1,6 @@
 // resources/js/pages/shifts/table/columns.ts
 import ShiftCell from '@/pages/shifts/table/ShiftCell.vue';
-import { ShiftTime, UserShift } from '@/pages/shifts/types/shiftTypes';
-import { WeekDay } from '@/pages/shifts/types/weekday';
+import { ShiftTime, UserShift, WeekDay } from '@/pages/shifts/types/shiftTypes';
 import { createColumnHelper } from '@tanstack/vue-table';
 import { format, parseISO } from 'date-fns';
 import { h } from 'vue';

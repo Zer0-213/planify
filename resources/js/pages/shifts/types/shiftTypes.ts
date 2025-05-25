@@ -11,3 +11,5 @@ export type UserShift = {
     user_id: number;
     shifts: ShiftTime[];
 };
+
+export type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
