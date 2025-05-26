@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\StaffService;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class StaffController extends Controller
 {
-    public function index(): Response
+    public function index(StaffService $staffService): Response
     {
-        return Inertia::render('staff/StaffMain');
+        $staffMembers = $staffService->getStaffMembers(auth()->user()->companies()->first());
+
+        return Inertia::render('staff/StaffMain', [
+            'staffMembers' => $staffMembers,
+        ]);
     }
 }

@@ -16,6 +16,7 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             new Permission("create_shifts", "Create Shift", "Allows the user to create shifts for a company."),
+            new permission("create_staff", "Create Staff", "Allows the user to create staff members for a company."),
         ];
 
         foreach ($permissions as $permission) {
