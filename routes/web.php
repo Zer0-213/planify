@@ -8,7 +8,7 @@ use App\Http\Middleware\UserHasCompany;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+Route::get('/', static function () {
     return Inertia::render('Welcome');
 })->name('home');
 
@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified', UserHasCompany::class])->group(function (
 
     Route::controller(StaffController::class)->prefix('staff')->group(function () {
         Route::get('/', 'index')->name('staff.index');
+        Route::post('/invite', 'inviteStaff')->name('staff.invite');
 
     });
 });

@@ -3,7 +3,12 @@
 namespace App\Services;
 
 use App\Models\Company;
+use App\Models\CompanyInvites;
+use App\Models\CompanyUser;
 use App\Models\Permission;
+use App\Models\User;
+use Illuminate\Validation\ValidationException;
+use Str;
 
 class StaffService
 {
@@ -27,7 +32,7 @@ class StaffService
                 'name' => $member->user->name,
                 'email' => $member->user->email,
                 'phoneNumber' => $member->user->phone_number,
-                'wage' => $member->user->wage,
+                'wage' => $member->wage ? $member->wage / 100 : 0,
                 'permissions' => $member->permissions->map(function (Permission $permission) {
                     return [
                         'name' => $permission->name,
@@ -38,6 +43,40 @@ class StaffService
         }
 
         return $staffMembers;
+    }
+
+    /**
+     * Invite a new staff member.
+     *
+     * @param CompanyUser $companyUser
+     * @param array $data
+     * @return void
+     * @throws ValidationException
+     */
+    public function inviteStaffMember(CompanyUser $companyUser, array $data): void
+    {
+
+
+        if (User::where('email', $data['email'])->exists() ||
+            CompanyInvites::query()->where('email', $data['email'])->exists()) {
+            throw ValidationException::withMessages(['This email is already registered or invited']);
+        }
+
+
+        $token = Str::uuid();
+        CompanyInvites::query()->create([
+            'company_id' => $companyUser->company_id,
+            'email' => $data['email'],
+            'name' => $data['name'],
+            'phone_number' => $data['phoneNumber'] ?? null,
+            'token' => $token,
+            'invited_by' => $companyUser->user_id,
+            'expires_at' => now()->addDays(),
+        ]);
+
+
+        // Mail::to($data['email'])->send(new StaffInviteMail($companyUser, $token));
+
     }
 
     /**

@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @mixin Builder
+ * @property int $company_id
+ * @property int $user_id
  */
 class CompanyUser extends Model
 {

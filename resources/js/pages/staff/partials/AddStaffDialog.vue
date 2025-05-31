@@ -1,28 +1,59 @@
 <script lang="ts" setup>
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import AddStaffForm from '@/pages/staff/partials/AddStaffForm.vue';
-import { Form } from 'vee-validate';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import StaffForm from '@/pages/staff/partials/staffForm/StaffForm.vue';
+import { useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
+type StaffFormData = {
+    name: string;
+    email: string;
+    phoneNumber: string;
+};
+
+const form = useForm({
+    name: '',
+    email: '',
+    phoneNumber: '',
+});
+
+const error = ref<string | null>(null);
+
+const handleFormEmit = (newForm: StaffFormData) => {
+    form.name = newForm.name;
+    form.email = newForm.email;
+    form.phoneNumber = newForm.phoneNumber;
+};
 </script>
 
 <template>
-    <span class="mb-4 flex w-full justify-end">
-        <Form v-slot="{ handleSubmit }" as="">
-            <Dialog>
-                <DialogTrigger as-child>
-                    <Button>Invite Staff Member</Button>
-                </DialogTrigger>
-                <DialogContent>
+    <section class="mb-4 flex w-full justify-end">
+        <Dialog>
+            <DialogTrigger as-child>
+                <Button>Invite Staff Member</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <form
+                    id="addStaffForm"
+                    class="flex w-full flex-col gap-4"
+                    @submit.prevent="
+                        () => {
+                            form.post('/staff/invite');
+                        }
+                    "
+                >
                     <DialogTitle>Invite New Staff Member</DialogTitle>
-                    <DialogHeader>Add a new staff member to the team</DialogHeader>
-                    <AddStaffForm :on-submit="handleSubmit" />
+                    <DialogDescription>Invite a user to your company's team</DialogDescription>
+                    <StaffForm :form="form" @update-form="handleFormEmit" />
+
                     <DialogFooter>
-                        <Button class="w-full" form="dialogForm" type="submit"> Invite Staff</Button>
+                        <Button class="w-full" form="addStaffForm" type="submit"> Invite Staff</Button>
+                        <p v-if="error" class="font-bold italic accent-red-600">{{ error }}</p>
                     </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </Form>
-    </span>
+                </form>
+            </DialogContent>
+        </Dialog>
+    </section>
 </template>
 
 <style scoped></style>

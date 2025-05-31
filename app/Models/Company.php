@@ -67,6 +67,11 @@ class Company extends Model
             ->withTimestamps();
     }
 
+    public function invites(): HasMany
+    {
+        return $this->hasMany(CompanyInvites::class);
+    }
+
     /**
      * Get the roles associated with the company.
      */
