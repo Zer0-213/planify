@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Jobs\SendStaffInviteEmailJob;
 use App\Models\Company;
-use App\Models\CompanyInvites;
+use App\Models\CompanyInvite;
 use App\Models\CompanyUser;
 use App\Models\Permission;
 use App\Models\User;
+use Hash;
 use Illuminate\Validation\ValidationException;
 use Str;
 
@@ -56,26 +58,25 @@ class StaffService
     public function inviteStaffMember(CompanyUser $companyUser, array $data): void
     {
 
-
         if (User::where('email', $data['email'])->exists() ||
-            CompanyInvites::query()->where('email', $data['email'])->exists()) {
-            throw ValidationException::withMessages(['This email is already registered or invited']);
+            CompanyInvite::query()->where('email', $data['email'])->exists()) {
+            throw ValidationException::withMessages(['email' => 'This email is already in use or pending invitation']);
         }
 
 
         $token = Str::uuid();
-        CompanyInvites::query()->create([
+        $invite = CompanyInvite::query()->create([
             'company_id' => $companyUser->company_id,
             'email' => $data['email'],
             'name' => $data['name'],
             'phone_number' => $data['phoneNumber'] ?? null,
-            'token' => $token,
+            'token' => Hash::make($token),
             'invited_by' => $companyUser->user_id,
             'expires_at' => now()->addDays(),
         ]);
 
 
-        // Mail::to($data['email'])->send(new StaffInviteMail($companyUser, $token));
+        SendStaffInviteEmailJob::dispatch($invite, $token);
 
     }
 

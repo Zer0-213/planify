@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import StaffForm from '@/pages/staff/partials/staffForm/StaffForm.vue';
 import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 
 type StaffFormData = {
     name: string;
@@ -16,8 +16,6 @@ const form = useForm({
     email: '',
     phoneNumber: '',
 });
-
-const error = ref<string | null>(null);
 
 const handleFormEmit = (newForm: StaffFormData) => {
     form.name = newForm.name;
@@ -37,9 +35,12 @@ const handleFormEmit = (newForm: StaffFormData) => {
                     id="addStaffForm"
                     class="flex w-full flex-col gap-4"
                     @submit.prevent="
-                        () => {
-                            form.post('/staff/invite');
-                        }
+                        form.post('/staff/invite', {
+                            onSuccess: () => {
+                                toast.success('Staff member invited successfully');
+                                form.reset();
+                            },
+                        })
                     "
                 >
                     <DialogTitle>Invite New Staff Member</DialogTitle>
@@ -47,8 +48,9 @@ const handleFormEmit = (newForm: StaffFormData) => {
                     <StaffForm :form="form" @update-form="handleFormEmit" />
 
                     <DialogFooter>
-                        <Button class="w-full" form="addStaffForm" type="submit"> Invite Staff</Button>
-                        <p v-if="error" class="font-bold italic accent-red-600">{{ error }}</p>
+                        <div class="flex w-full flex-col gap-2">
+                            <Button :disabled="form.processing" class="w-full" form="addStaffForm" type="submit"> Invite Staff </Button>
+                        </div>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -85,7 +85,7 @@ class User extends Authenticatable
     // Link to company_invites
     public function companyInvites(): HasMany
     {
-        return $this->hasMany(CompanyInvites::class, 'invited_by');
+        return $this->hasMany(CompanyInvite::class, 'invited_by');
     }
 
     // Pivot table for user-to-company

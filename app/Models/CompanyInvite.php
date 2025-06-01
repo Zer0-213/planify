@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * Class CompanyInvites
+ * Class CompanyInvite
  *
  * Represents an invitation to join a company.
  *
@@ -18,13 +18,15 @@ use Illuminate\Support\Carbon;
  * @property string $token
  * @property int $invited_by
  * @property Carbon|null $expires_at
+ * @property string|null $phone_number
  */
-class CompanyInvites extends Model
+class CompanyInvite extends Model
 {
     protected $fillable = [
         'company_id',
-        'email',
         'name',
+        'email',
+        'phone_number',
         'token',
         'invited_by',
         'expires_at',

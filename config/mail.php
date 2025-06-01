@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'mailgun'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,6 +36,17 @@ return [
     */
 
     'mailers' => [
+
+        'mailgun' => [
+            'transport' => 'mailgun',
+//            'client' => [
+//                'timeout' => 5,
+//            ],
+            'domain' => env('MAILGUN_DOMAIN'),
+            'secret' => env('MAILGUN_SECRET'),
+            'endpoint' => env('MAILGUN_ENDPOINT', 'api.eu.mailgun.net'),
+            'scheme' => 'https',
+        ],
 
         'smtp' => [
             'transport' => 'smtp',
@@ -69,7 +80,6 @@ return [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
         ],
-
         'log' => [
             'transport' => 'log',
             'channel' => env('MAIL_LOG_CHANNEL'),
