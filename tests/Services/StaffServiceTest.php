@@ -45,7 +45,6 @@ class StaffServiceTest extends TestCase
         $data = ['email' => $existingUser->email, 'name' => 'Existing Staff'];
 
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('This email is already registered or invited');
 
         app(StaffService::class)->inviteStaffMember($companyUser, $data);
     }

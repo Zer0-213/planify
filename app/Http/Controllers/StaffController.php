@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StaffInviteRequest;
 use App\Models\User;
 use App\Services\StaffService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,19 +25,21 @@ class StaffController extends Controller
         ]);
     }
 
-    public function inviteStaff(Request $request): RedirectResponse
+    /**
+     * Invite a staff member to the company.
+     *
+     * @param StaffInviteRequest $request
+     * @throws ValidationException
+     */
+    public function inviteStaff(StaffInviteRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'phoneNumber' => 'nullable|string|max:15',
-        ]);
+
         /** @var User $user */
         $user = auth()->user();
 
         $companyUser = $user->companyUsers()->where('company_id', $user->companies()->first()->id)->first();
 
-        $this->staffService->inviteStaffMember($companyUser, $validated);
+        $this->staffService->inviteStaffMember($companyUser, $request->validated());
         return redirect()->back()->with('success', 'Staff member invited successfully.');
 
     }
