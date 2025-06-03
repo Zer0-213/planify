@@ -18,7 +18,6 @@ class StaffInviteMail extends Mailable
      */
     public function __construct(public CompanyInvite $companyInvite, public string $token)
     {
-        //
     }
 
     /**
@@ -26,7 +25,8 @@ class StaffInviteMail extends Mailable
      */
     public function build(): StaffInviteMail
     {
-        return $this->subject('You are invited to join the company')
+        return $this->from('postmaster@sandbox6632cb66b59c436fb95cb0fb17997fc2.mailgun.org', 'Planify')
+            ->subject('You are invited to join the company')
             ->markdown('emails.staff_invite') // we'll create this
             ->with([
                 'companyInvite' => $this->companyInvite,

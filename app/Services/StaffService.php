@@ -8,7 +8,7 @@ use App\Models\CompanyInvite;
 use App\Models\CompanyUser;
 use App\Models\Permission;
 use App\Models\User;
-use Hash;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Str;
 
