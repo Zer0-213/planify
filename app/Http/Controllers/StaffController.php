@@ -29,6 +29,7 @@ class StaffController extends Controller
      * Invite a staff member to the company.
      *
      * @param StaffInviteRequest $request
+     * @return RedirectResponse
      * @throws ValidationException
      */
     public function inviteStaff(StaffInviteRequest $request): RedirectResponse
