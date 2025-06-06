@@ -19,9 +19,10 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->company(),
+            'name' => $this->faker->company,
             'owner_id' => User::factory(),
-            'type' => $this->faker->company()
+            'type' => $this->faker->randomElement(['LLC', 'Corporation', 'Partnership', 'Sole Proprietorship', 'Non-Profit'])
+
         ];
 
     }

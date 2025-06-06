@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StaffInviteRequest extends FormRequest
+class CreateStaffRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +27,9 @@ class StaffInviteRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'phoneNumber' => 'nullable|string|max:15',
+            'phone_number' => 'nullable|string|max:15',
+            'password' => 'required|string|min:8',
             'wage' => 'nullable|numeric|min:0',
-            'role' => ['required', 'string', Rule::in(array_column(RoleEnum::cases(), 'value'))],
-        ];
+            'role' => ['nullable', 'string', Rule::in(array_column(RoleEnum::cases(), 'value'))],];
     }
 }

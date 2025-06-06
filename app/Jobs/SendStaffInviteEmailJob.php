@@ -5,12 +5,13 @@ namespace App\Jobs;
 use App\Mail\StaffInviteMail;
 use App\Models\CompanyInvite;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Mail\Mailer;
 
 class SendStaffInviteEmailJob implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, Dispatchable;
 
     /**
      * Create a new job instance.

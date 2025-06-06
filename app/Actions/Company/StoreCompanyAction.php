@@ -2,9 +2,11 @@
 
 namespace App\Actions\Company;
 
+use App\Enums\RoleEnum;
 use App\Models\Company;
-use App\Models\Permission;
 use Illuminate\Http\RedirectResponse;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class StoreCompanyAction
 {
@@ -23,9 +25,8 @@ class StoreCompanyAction
         // Get the newly created company user record
         $companyUser = $company->companyUsers()->where('user_id', auth()->id())->first();
 
-        // Get all available permissions and attach them
-        $allPermissions = Permission::all();
-        $companyUser->permissions()->attach($allPermissions->pluck('id')->toArray());
+        $companyUser->permissions()->attach(Permission::all()->pluck('id')->toArray());
+        $companyUser->roles()->attach(Role::query()->where('name', RoleEnum::ADMIN)->first()->id);
 
         return redirect()->route("dashboard");
     }

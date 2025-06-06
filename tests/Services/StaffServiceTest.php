@@ -7,6 +7,7 @@ use App\Models\CompanyUser;
 use App\Models\User;
 use App\Services\StaffService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -15,6 +16,10 @@ class StaffServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+
+    /**
+     * @throws ValidationException
+     */
     #[Test]
     public function invitesNewStaffMemberSuccessfully(): void
     {
@@ -23,6 +28,7 @@ class StaffServiceTest extends TestCase
             'email' => 'newstaff@example.com',
             'name' => 'New Staff',
             'phoneNumber' => '1234567890',
+            'role' => 'Staff',
         ];
 
         $this->assertDatabaseMissing('company_invites', ['email' => $data['email']]);
@@ -37,6 +43,7 @@ class StaffServiceTest extends TestCase
         ]);
     }
 
+
     #[Test]
     public function throwsValidationExceptionIfEmailAlreadyRegistered(): void
     {
@@ -46,9 +53,11 @@ class StaffServiceTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
+
         app(StaffService::class)->inviteStaffMember($companyUser, $data);
     }
 
+    #[Test]
     public function throwsValidationExceptionIfEmailAlreadyInvited(): void
     {
         $companyUser = CompanyUser::factory()->create();
@@ -56,7 +65,8 @@ class StaffServiceTest extends TestCase
         $data = ['email' => 'invited@example.com', 'name' => 'Invited Staff'];
 
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('This email is already registered or invited');
+        $this->expectExceptionMessage('This email is already in use or pending invitation');
+
 
         app(StaffService::class)->inviteStaffMember($companyUser, $data);
     }
@@ -64,13 +74,19 @@ class StaffServiceTest extends TestCase
     #[Test]
     public function createsInviteWithDefaultPhoneNumberIfNotProvided(): void
     {
+        // Set up queue fake to prevent actual job dispatch
+        Queue::fake();
+
         $companyUser = CompanyUser::factory()->create();
         $data = [
             'email' => 'staff@example.com',
             'name' => 'Staff Member',
         ];
 
-        app(StaffService::class)->inviteStaffMember($companyUser, $data);
+        $staffService = new StaffService();
+
+
+        $staffService->inviteStaffMember($companyUser, $data);
 
         $this->assertDatabaseHas('company_invites', [
             'email' => $data['email'],
@@ -79,28 +95,37 @@ class StaffServiceTest extends TestCase
         ]);
     }
 
+    /**
+     * @throws ValidationException
+     */
+    #[Test]
     public function setsCorrectExpirationDateForInvite(): void
     {
+
         $companyUser = CompanyUser::factory()->create();
         $data = [
             'email' => 'expiry@example.com',
             'name' => 'Expiry Test',
         ];
 
-        app(StaffService::class)->inviteStaffMember($companyUser, $data);
+        $staffService = new StaffService();
+        $staffService->inviteStaffMember($companyUser, $data);
 
         $invite = CompanyInvite::where('email', $data['email'])->first();
         $this->assertNotNull($invite);
         $this->assertEquals(now()->addDays()->format('Y-m-d'), $invite->expires_at->format('Y-m-d'));
     }
 
+    #[Test]
     public function storesTokenForInvite(): void
     {
+
         $companyUser = CompanyUser::factory()->create();
         $data = [
             'email' => 'token@example.com',
             'name' => 'Token Test',
         ];
+
 
         app(StaffService::class)->inviteStaffMember($companyUser, $data);
 
@@ -110,8 +135,10 @@ class StaffServiceTest extends TestCase
         $this->assertIsString($invite->token);
     }
 
+    #[Test]
     public function setsCorrectInviterInformation(): void
     {
+
         $companyUser = CompanyUser::factory()->create();
         $data = [
             'email' => 'inviter@example.com',
@@ -124,5 +151,12 @@ class StaffServiceTest extends TestCase
             'email' => $data['email'],
             'invited_by' => $companyUser->user_id,
         ]);
+    }
+
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Queue::fake();
     }
 }

@@ -20,12 +20,12 @@ class DatabaseSeeder extends Seeder
             ['email' => 'zeeshankhn123@outlook.com'],
             [
                 'name' => 'Zeeshan',
-                'password' => bcrypt('test123'),
+                'password' => bcrypt('Zeeshan786'),
             ]
         );
 
         $this->call([
-            PermissionSeeder::class,
+            RolePermissionSeeder::class,
         ]);
 
     }

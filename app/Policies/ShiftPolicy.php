@@ -29,7 +29,7 @@ class ShiftPolicy
     public function create(User $user, int $companyId): bool
     {
         // Check permission in the specified company
-        return $user->hasPermissionInCompany('create_shifts', $companyId);
+        return $user->hasPermissionInCompany('create-shift', $companyId);
     }
 
 

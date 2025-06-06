@@ -1,8 +1,7 @@
-export type StaffProps = {
-    id: number;
+export type StaffFormData = {
     name: string;
     email: string;
     phoneNumber: string;
     wage: number;
-    role: string;
+    role: string | null;
 };

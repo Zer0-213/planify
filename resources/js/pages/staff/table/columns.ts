@@ -13,14 +13,8 @@ export const columns = [
     columnHelper.accessor('phoneNumber', {
         header: 'Phone Number',
     }),
-    columnHelper.accessor('permissions', {
-        header: 'Permissions',
-        cell: (info) => {
-            return info
-                .getValue()
-                .map((permission) => permission.label)
-                .join(', ');
-        },
+    columnHelper.accessor('role', {
+        header: 'Role',
     }),
     columnHelper.accessor('wage', {
         header: 'Wage',

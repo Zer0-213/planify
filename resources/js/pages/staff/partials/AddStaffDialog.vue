@@ -2,26 +2,22 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import StaffForm from '@/pages/staff/partials/staffForm/StaffForm.vue';
+import { StaffFormData } from '@/pages/staff/types/staffFormData';
 import { useForm } from '@inertiajs/vue3';
+import { defineProps } from 'vue';
 import { toast } from 'vue-sonner';
 
-type StaffFormData = {
-    name: string;
-    email: string;
-    phoneNumber: string;
-};
+defineProps<{
+    roles: string[];
+}>();
 
-const form = useForm({
+const form = useForm<StaffFormData>({
     name: '',
     email: '',
     phoneNumber: '',
+    wage: 0,
+    role: null,
 });
-
-const handleFormEmit = (newForm: StaffFormData) => {
-    form.name = newForm.name;
-    form.email = newForm.email;
-    form.phoneNumber = newForm.phoneNumber;
-};
 </script>
 
 <template>
@@ -36,8 +32,11 @@ const handleFormEmit = (newForm: StaffFormData) => {
                     class="flex w-full flex-col gap-4"
                     @submit.prevent="
                         form.post('/staff/invite', {
+                            onBefore: () => {
+                                console.log(form);
+                            },
                             onSuccess: () => {
-                                toast.success('Staff member invited successfully');
+                                toast.success('Staff member created successfully');
                                 form.reset();
                             },
                         })
@@ -45,7 +44,7 @@ const handleFormEmit = (newForm: StaffFormData) => {
                 >
                     <DialogTitle>Invite New Staff Member</DialogTitle>
                     <DialogDescription>Invite a user to your company's team</DialogDescription>
-                    <StaffForm :form="form" @update-form="handleFormEmit" />
+                    <StaffForm v-model:form="form" :roles="roles" />
 
                     <DialogFooter>
                         <div class="flex w-full flex-col gap-2">

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Spatie\Permission\Models\Role;
 
 /**
  *
@@ -71,15 +72,7 @@ class Company extends Model
     {
         return $this->hasMany(CompanyInvite::class);
     }
-
-    /**
-     * Get the roles associated with the company.
-     */
-    public function roles(): HasMany
-    {
-        return $this->hasMany(Role::class);
-    }
-
+    
     public function companyUsersWithShifts(): HasMany
     {
         return $this->companyUsers()->with(['user', 'shifts']);

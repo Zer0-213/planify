@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->string('phone_number')->nullable();
             $table->string('name');
             $table->string('token')->unique();
+            $table->integer('wage')->nullable();
+            $table->foreignId('role_id')->constrained();
             $table->foreignId('invited_by')->constrained('users')->onDelete('cascade');
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();

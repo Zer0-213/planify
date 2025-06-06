@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Spatie\Permission\Models\Role;
 
 /**
  * Class CompanyInvite
@@ -22,12 +24,16 @@ use Illuminate\Support\Carbon;
  */
 class CompanyInvite extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'company_id',
         'name',
         'email',
         'phone_number',
         'token',
+        'wage',
+        'role_id',
         'invited_by',
         'expires_at',
     ];
@@ -49,5 +55,10 @@ class CompanyInvite extends Model
     public function hasExpired(): bool
     {
         return $this->expires_at && now()->isAfter($this->expires_at);
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
     }
 }

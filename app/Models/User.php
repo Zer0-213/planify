@@ -7,6 +7,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -15,6 +16,9 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Log;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 /**
  * @property int $id
@@ -89,13 +93,6 @@ class User extends Authenticatable
     }
 
     // Pivot table for user-to-company
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'company_user_role')
-            ->withTimestamps();
-    }
-
-    // Direct link to the pivot model
 
     public function shifts(): HasManyThrough
     {
@@ -109,11 +106,13 @@ class User extends Authenticatable
         );
     }
 
-    // Roles via pivot
+    // Direct link to the pivot model
 
     public function getPermissionsForCompany(Company $company): \Illuminate\Support\Collection
     {
         $companyUser = $this->companyUsers()->where('company_id', $company->id)->first();
+
+        Log::info($companyUser);
 
         if (!$companyUser) {
             return collect();
@@ -122,20 +121,21 @@ class User extends Authenticatable
         return $companyUser->permissions()->pluck('name');
     }
 
-    // Permissions via pivot
+    // Roles via pivot
 
     public function companyUsers(): HasMany
     {
         return $this->hasMany(CompanyUser::class);
     }
 
-    // Indirect relationship to shifts via company_user
+    // Permissions via pivot
 
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'company_user_permission')
-            ->withTimestamps();
+        return $this->belongsToMany(Permission::class, 'company_user_permission');
     }
+
+    // Indirect relationship to shifts via company_user
 
     /**
      * Check if the user has a specific permission in a specific company.
@@ -146,10 +146,29 @@ class User extends Authenticatable
      */
     public function hasPermissionInCompany(string $permission, int $companyId): bool
     {
-        return $this->permissions()
-            ->where('name', $permission)
-            ->wherePivot('company_id', $companyId)
-            ->exists();
+        $companyUser = $this->companyUsers()->where('company_id', $companyId)->first();
+
+        if (!$companyUser) {
+            return false;
+        }
+
+        $roles = $this->roles()->where('company_id', $companyId)->with('permissions')->get();
+
+
+        foreach ($roles as $role) {
+            if ($role->permissions->contains('name', $permission)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+
+    public function roles(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'company_user_role');
     }
 
 

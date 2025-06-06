@@ -11,10 +11,11 @@ const breadcrumbs = [{ title: 'Staff', href: '/staff' }];
 
 const props = defineProps<{
     staffMembers: StaffProps[];
+    roles: string[];
 }>();
 
 const permissions = usePage().props?.auth?.permissions as string[];
-const canCreateStaff = permissions.includes('create_staff');
+const canCreateStaff = permissions.includes('create_user');
 
 const { staffMembers } = props;
 </script>
@@ -25,7 +26,7 @@ const { staffMembers } = props;
             <h1 class="mb-4 text-2xl font-bold">Staff Management</h1>
             <p>Manage your staff members here.</p>
             <section class="mt-6 w-full">
-                <AddStaffDialog v-if="canCreateStaff" />
+                <AddStaffDialog v-if="canCreateStaff" :roles="roles" />
                 <AppTable :columns="columns" :data="staffMembers" table-title="Staff List" />
             </section>
         </div>
