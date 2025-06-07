@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,8 +17,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @mixin Builder
  * @property int $company_id
  * @property int $user_id
- * * @property-read Company $company
- * * @property-read User $user
+ * @property-read Company $company
+ * @property-read User $user
+ * @property-read Collection<int, Role> $roles
+ * @property-read Collection<int, Permission> $permissions
+ *
  */
 class CompanyUser extends Model
 {
@@ -57,6 +61,8 @@ class CompanyUser extends Model
 
     /**
      * Get the roles for this company-user relationship.
+     *
+     * @return BelongsToMany<Role>
      */
     public function roles(): BelongsToMany
     {
@@ -65,6 +71,8 @@ class CompanyUser extends Model
 
     /**
      * Get the permissions for this company-user relationship.
+     *
+     * @return BelongsToMany<Permission>
      */
     public function permissions(): BelongsToMany
     {
