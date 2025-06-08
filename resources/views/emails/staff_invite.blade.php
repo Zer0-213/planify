@@ -14,7 +14,7 @@
 
     {{ $companyInvite->inviter?->name ?? 'Someone' }} has invited you to join {{$companyInvite->company?->name}} on our platform.
 
-    @component('mail::button', ['url' => url("/accept-invite?token=$token&invite_id=$companyInvite->id")])
+    @component('mail::button', ['url' => route('acceptInvite', ['invite_token' => $token, 'invite_id' => $companyInvite->id])])
         Accept Invitation
     @endcomponent
 

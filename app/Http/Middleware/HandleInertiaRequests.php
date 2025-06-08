@@ -38,8 +38,18 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
         $user = $request->user();
-        $company = $user ? $user->companies()->first() : null;
-        $permissions = $user && $company ? $user->getPermissionsForCompany($company) : [];
+        $company = null;
+        $permissions = [];
+
+        if ($user) {
+            if (session()->has('just_accepted_invite')) {
+                $company = $user->companies()->first();
+                $permissions = $user->getPermissionsForCompany($company);
+            } else {
+                $company = $user->companies()->first();
+                $permissions = $company ? $user->getPermissionsForCompany($company) : [];
+            }
+        }
 
         return [
             ...parent::share($request),
@@ -51,6 +61,12 @@ class HandleInertiaRequests extends Middleware
                 'permissions' => $permissions,
             ],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+                'info' => $request->session()->get('info'),
+                'warning' => $request->session()->get('warning'),
+            ],
         ];
     }
 }

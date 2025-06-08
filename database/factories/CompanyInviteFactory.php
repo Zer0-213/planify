@@ -4,8 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Company;
 use App\Models\CompanyInvite;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<CompanyInvite>
@@ -14,6 +14,7 @@ class CompanyInviteFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * token is commented out because they should be generated dynamically in tests or services
      *
      * @return array<string, mixed>
      */
@@ -23,9 +24,9 @@ class CompanyInviteFactory extends Factory
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,
             'company_id' => Company::factory(),
-            'token' => Str::random(32),
+//            'token' => Hash::make(Str::random(32)),
             'expires_at' => now()->addDays(7), // Default expiration time of 7 days
-            'invited_by' => $this->faker->randomElement([1, 2, 3]), // Assuming user IDs 1, 2, and 3 exist
+            'invited_by' => User::factory(),
         ];
     }
 }

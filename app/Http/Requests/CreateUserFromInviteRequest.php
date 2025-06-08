@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class InviteStaffRequest extends FormRequest
+class CreateUserFromInviteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,14 +18,14 @@ class InviteStaffRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'phoneNumber' => 'nullable|string|max:15',
+            'invite_id' => 'required|integer|exists:company_invites,id',
+            'invite_token' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
         ];
     }
 }

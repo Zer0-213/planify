@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 
@@ -21,6 +22,8 @@ use Spatie\Permission\Models\Role;
  * @property int $invited_by
  * @property Carbon|null $expires_at
  * @property string|null $phone_number
+ *
+ * @mixin Builder
  */
 class CompanyInvite extends Model
 {

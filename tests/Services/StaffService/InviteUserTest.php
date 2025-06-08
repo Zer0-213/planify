@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Services;
+namespace Services\StaffService;
 
 use App\Models\CompanyInvite;
 use App\Models\CompanyUser;
@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class StaffServiceTest extends TestCase
+class InviteUserTest extends TestCase
 {
     use RefreshDatabase;
 

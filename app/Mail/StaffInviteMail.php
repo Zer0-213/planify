@@ -27,7 +27,7 @@ class StaffInviteMail extends Mailable
     {
         return $this->from('postmaster@sandbox6632cb66b59c436fb95cb0fb17997fc2.mailgun.org', 'Planify')
             ->subject('You are invited to join the company')
-            ->markdown('emails.staff_invite') // we'll create this
+            ->markdown('emails.staff_invite')
             ->with([
                 'companyInvite' => $this->companyInvite,
                 'token' => $this->token,

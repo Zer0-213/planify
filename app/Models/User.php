@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +15,6 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
-use Log;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -53,7 +51,7 @@ use Spatie\Permission\Models\Role;
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
  *
- * @mixin Eloquent
+ * @mixin Builder
  */
 class User extends Authenticatable
 {
@@ -107,13 +105,10 @@ class User extends Authenticatable
     }
 
     // Direct link to the pivot model
-
     public function getPermissionsForCompany(Company $company): \Illuminate\Support\Collection
     {
         $companyUser = $this->companyUsers()->where('company_id', $company->id)->first();
-
-        Log::info($companyUser);
-
+        
         if (!$companyUser) {
             return collect();
         }
@@ -121,7 +116,6 @@ class User extends Authenticatable
         return $companyUser->permissions()->pluck('name');
     }
 
-    // Roles via pivot
 
     public function companyUsers(): HasMany
     {
@@ -129,7 +123,6 @@ class User extends Authenticatable
     }
 
     // Permissions via pivot
-
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'company_user_permission');
