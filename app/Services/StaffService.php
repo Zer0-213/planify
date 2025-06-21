@@ -47,7 +47,7 @@ readonly class StaffService
      *
      * @param int $id
      * @param array $data
-     * @return bool
+     * @return void
      */
     public function updateStaffMember(int $id, array $data): void
     {
@@ -56,7 +56,7 @@ readonly class StaffService
             ->find($id);
 
         if (!$companyUser) {
-            return;
+            throw ValidationException::withMessages(['error' => 'Staff member not found.']);
         }
 
         if (isset($data['wage']) && $companyUser->wage !== $data['wage'] * 100) {
@@ -79,7 +79,7 @@ readonly class StaffService
                     ->find($newRoleId);
 
                 if (!$role) {
-                    throw ValidationException::withMessages(['error' => 'Role not found.']);
+                    throw ValidationException::withMessages(['error' => 'Role invalid']);
                 }
 
                 $companyUser->roles()->sync([$role->id]);

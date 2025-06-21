@@ -8,6 +8,7 @@ use App\Models\CompanyUser;
 use App\Models\User;
 use App\Services\StaffService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -22,43 +23,32 @@ class UpdateStaffTest extends TestCase
     {
         parent::setUp();
 
-        $this->staffService = new StaffService(new CompanyUser());
+        $this->staffService = new StaffService(new CompanyUser(), new Role());
     }
 
     public function testUpdateStaffMemberReturnsFalseIfStaffMemberNotFound(): void
     {
-        $result = $this->staffService->updateStaffMember(999, ['wage' => 20]);
-
-        $this->assertFalse($result);
+        $this->expectException(ValidationException::class);
+        $this->staffService->updateStaffMember(999, ['wage' => 20]);
     }
 
     public function testUpdateStaffMemberUpdatesWageSuccessfully(): void
     {
-        // Create test data
-        $user = User::factory()->create();
-        $company = Company::factory()->create();
-        $companyUser = CompanyUser::factory()->create([
-            'user_id' => $user->id,
-            'company_id' => $company->id,
-            'wage' => 1500, // Initial wage in cents
-        ]);
+        $companyUser = CompanyUser::factory()->create(['wage' => 1500]);
 
-        $result = $this->staffService->updateStaffMember($companyUser->id, ['wage' => 20]);
-
-        $this->assertTrue($result);
-
+        $this->staffService->updateStaffMember($companyUser->id, ['wage' => 20]);
+        
         $companyUser->refresh();
-        $this->assertEquals(2000, $companyUser->wage); // 20 * 100 = 2000 cents
+        $companyUser->refresh();
+        $this->assertDatabaseHas('company_users', [
+            'id' => $companyUser->id,
+            'wage' => 2000
+        ]);
     }
 
     public function testUpdateStaffMemberAssignsRoleSuccessfully(): void
     {
-        $user = User::factory()->create();
-        $company = Company::factory()->create();
-        $companyUser = CompanyUser::factory()->create([
-            'user_id' => $user->id,
-            'company_id' => $company->id,
-        ]);
+        $companyUser = CompanyUser::factory()->create();
 
         $adminRole = Role::create(['name' => 'Admin', 'guard_name' => 'web']);
         $updatePermission = Permission::create(['name' => PermissionEnum::UPDATE_STAFF_MEMBER->value, 'guard_name' => 'web']);
@@ -75,9 +65,8 @@ class UpdateStaffTest extends TestCase
 
         $expectedRole->givePermissionTo($updatePermission);
 
-        $result = $this->staffService->updateStaffMember($companyUser->id, ['role_id' => $expectedRole->id]);
+        $this->staffService->updateStaffMember($companyUser->id, ['role_id' => $expectedRole->id]);
 
-        $this->assertTrue($result);
 
         $companyUser->refresh();
         $this->assertTrue($companyUser->roles->contains('id', $expectedRole->id));
@@ -90,22 +79,14 @@ class UpdateStaffTest extends TestCase
 
     public function testUpdateStaffMemberUpdatesWageAndAssignsRole(): void
     {
-        $user = User::factory()->create();
-        $company = Company::factory()->create();
-        $companyUser = CompanyUser::factory()->create([
-            'user_id' => $user->id,
-            'company_id' => $company->id,
-            'wage' => 1500,
-        ]);
+        $companyUser = CompanyUser::factory()->create(['wage' => 1500]);
 
         $role = Role::create(['name' => 'Supervisor', 'guard_name' => 'web']);
 
-        $result = $this->staffService->updateStaffMember($companyUser->id, [
+        $this->staffService->updateStaffMember($companyUser->id, [
             'wage' => 30,
             'role_id' => $role->id
         ]);
-
-        $this->assertTrue($result);
 
         $companyUser->refresh();
         $this->assertEquals(3000, $companyUser->wage);
@@ -114,23 +95,16 @@ class UpdateStaffTest extends TestCase
 
     public function testUpdateStaffMemberWithInvalidRoleId(): void
     {
-        $user = User::factory()->create();
-        $company = Company::factory()->create();
-        $companyUser = CompanyUser::factory()->create([
-            'user_id' => $user->id,
-            'company_id' => $company->id,
-        ]);
+        $companyUser = CompanyUser::factory()->create();
 
-        // This should still return true even if role assignment fails
-        // because the save() operation succeeds
-        $result = $this->staffService->updateStaffMember($companyUser->id, ['role_id' => 999]);
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Role invalid');
+        $this->staffService->updateStaffMember($companyUser->id, ['role_id' => 999]);
 
-        $this->assertTrue($result);
     }
 
     public function testUpdateStaffMemberWithNoDataToUpdate(): void
     {
-        // Create test data
         $user = User::factory()->create();
         $company = Company::factory()->create();
         $companyUser = CompanyUser::factory()->create([
@@ -138,8 +112,10 @@ class UpdateStaffTest extends TestCase
             'company_id' => $company->id,
         ]);
 
-        $result = $this->staffService->updateStaffMember($companyUser->id, []);
+        $this->staffService->updateStaffMember($companyUser->id, []);
 
-        $this->assertTrue($result);
+        $companyUser->refresh();
+
+        $this->assertTrue($companyUser->is($companyUser));
     }
 }
