@@ -36,6 +36,8 @@ Route::middleware(['auth', 'verified', UserHasCompany::class])->group(function (
 
     Route::controller(StaffController::class)->prefix('staff')->group(function () {
         Route::get('/', 'index')->name('staff.index');
+        Route::delete('/destroy/{id}', 'deleteStaffMember')->name('staff.destroy');
+        Route::put('/update/{id}', 'updateStaffMember')->name('staff.update');
     });
 });
 

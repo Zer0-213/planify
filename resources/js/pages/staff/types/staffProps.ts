@@ -5,4 +5,5 @@ export type StaffProps = {
     phoneNumber: string;
     wage: number;
     role: string;
+    edit?: string; // Optional, used for delete action
 };

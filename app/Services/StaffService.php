@@ -3,10 +3,14 @@
 namespace App\Services;
 
 use App\Models\Company;
+use App\Models\CompanyUser;
+use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 
-class StaffService
+readonly class StaffService
 {
-    public function __construct()
+
+    public function __construct(private CompanyUser $companyUser, private Role $role)
     {
     }
 
@@ -25,7 +29,8 @@ class StaffService
 
         foreach ($staff as $member) {
             $staffMembers[] = [
-                'id' => $member->user->id,
+                'id' => $member->id,
+                'userId' => $member->user->id,
                 'name' => $member->user->name,
                 'email' => $member->user->email,
                 'phoneNumber' => $member->user->phone_number,
@@ -46,19 +51,54 @@ class StaffService
      */
     public function updateStaffMember(int $id, array $data): bool
     {
-        // Logic to update an existing staff member in the database
-        return true;
+        $companyUser = $this->companyUser
+            ->with(['roles', 'company'])
+            ->find($id);
+
+        if (!$companyUser) {
+            return false;
+        }
+
+        if (isset($data['wage']) && $companyUser->wage !== $data['wage'] * 100) {
+            $companyUser->wage = $data['wage'] * 100;
+        }
+
+        if (isset($data['role_id'])) {
+            $newRoleId = $data['role_id'];
+
+            $currentRoleIds = $companyUser->roles->pluck('id')->toArray();
+
+            if (!in_array($newRoleId, $currentRoleIds)) {
+                if ($companyUser->user_id === $companyUser->company->owner_id) {
+                    throw ValidationException::withMessages(['error' => 'You cannot change the role of the company owner.']);
+                }
+
+                $role = $this->role
+                    ->newQuery()
+                    ->with('permissions')
+                    ->find($newRoleId);
+
+                if (!$role) {
+                    throw ValidationException::withMessages(['error' => 'Role not found.']);
+                }
+
+                $companyUser->roles()->sync([$role->id]);
+                $companyUser->permissions()->sync($role->permissions->pluck('id')->toArray());
+            }
+        }
+
+        return $companyUser->save();
     }
+
 
     /**
      * Delete a staff member.
      *
-     * @param int $id
-     * @return bool
+     * @param int $staffId
+     * @return void
      */
-    public function deleteStaffMember(int $id): bool
+    public function deleteStaffMember(int $staffId): void
     {
-        // Logic to delete a staff member from the database
-        return true;
+        $this->companyUser->find($staffId)?->delete();
     }
 }

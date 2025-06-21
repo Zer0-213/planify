@@ -63,7 +63,7 @@ const emit = defineEmits<{
                                     }
                                 "
                             >
-                                {{ cell.getValue() }}
+                                <FlexRender :props="cell.getContext()" :render="cell.column.columnDef.cell" />
                             </TableCell>
                         </TableRow>
                     </template>

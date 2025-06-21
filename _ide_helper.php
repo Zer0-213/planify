@@ -4368,46 +4368,6 @@ namespace Illuminate\Support\Facades {
     /**
      * 
      *
-     * @method static bool has(array|string $key)
-     * @method static bool missing(string $key)
-     * @method static mixed get(array|string $key, mixed $default = null)
-     * @method static array many(array $keys)
-     * @method static iterable getMultiple(iterable $keys, mixed $default = null)
-     * @method static mixed pull(array|string $key, mixed $default = null)
-     * @method static bool put(array|string $key, mixed $value, \DateTimeInterface|\DateInterval|int|null $ttl = null)
-     * @method static bool set(string $key, mixed $value, null|int|\DateInterval $ttl = null)
-     * @method static bool putMany(array $values, \DateTimeInterface|\DateInterval|int|null $ttl = null)
-     * @method static bool setMultiple(iterable $values, null|int|\DateInterval $ttl = null)
-     * @method static bool add(string $key, mixed $value, \DateTimeInterface|\DateInterval|int|null $ttl = null)
-     * @method static int|bool increment(string $key, mixed $value = 1)
-     * @method static int|bool decrement(string $key, mixed $value = 1)
-     * @method static bool forever(string $key, mixed $value)
-     * @method static mixed remember(string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
-     * @method static mixed sear(string $key, \Closure $callback)
-     * @method static mixed rememberForever(string $key, \Closure $callback)
-     * @method static mixed flexible(string $key, array $ttl, callable $callback, array|null $lock = null)
-     * @method static bool forget(string $key)
-     * @method static bool delete(string $key)
-     * @method static bool deleteMultiple(iterable $keys)
-     * @method static bool clear()
-     * @method static \Illuminate\Cache\TaggedCache tags(array|mixed $names)
-     * @method static string|null getName()
-     * @method static bool supportsTags()
-     * @method static int|null getDefaultCacheTime()
-     * @method static \Illuminate\Cache\Repository setDefaultCacheTime(int|null $seconds)
-     * @method static \Illuminate\Contracts\Cache\Store getStore()
-     * @method static \Illuminate\Cache\Repository setStore(\Illuminate\Contracts\Cache\Store $store)
-     * @method static \Illuminate\Contracts\Events\Dispatcher|null getEventDispatcher()
-     * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
-     * @method static void macro(string $name, object|callable $macro)
-     * @method static void mixin(object $mixin, bool $replace = true)
-     * @method static bool hasMacro(string $name)
-     * @method static void flushMacros()
-     * @method static mixed macroCall(string $method, array $parameters)
-     * @method static bool flush()
-     * @method static string getPrefix()
-     * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, string|null $owner = null)
-     * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
      * @see \Illuminate\Cache\CacheManager
      * @see \Illuminate\Cache\Repository
      */
@@ -4581,6 +4541,677 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Cache\CacheManager $instance */
             return $instance->setApplication($app);
+        }
+
+        /**
+         * Determine if an item exists in the cache.
+         *
+         * @param array|string $key
+         * @return bool 
+         * @static 
+         */
+        public static function has($key)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->has($key);
+        }
+
+        /**
+         * Determine if an item doesn't exist in the cache.
+         *
+         * @param string $key
+         * @return bool 
+         * @static 
+         */
+        public static function missing($key)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->missing($key);
+        }
+
+        /**
+         * Retrieve an item from the cache by key.
+         *
+         * @param array|string $key
+         * @param mixed $default
+         * @return mixed 
+         * @static 
+         */
+        public static function get($key, $default = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->get($key, $default);
+        }
+
+        /**
+         * Retrieve multiple items from the cache by key.
+         * 
+         * Items not found in the cache will have a null value.
+         *
+         * @param array $keys
+         * @return array 
+         * @static 
+         */
+        public static function many($keys)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->many($keys);
+        }
+
+        /**
+         * Obtains multiple cache items by their unique keys.
+         *
+         * @return iterable 
+         * @param iterable<string> $keys A list of keys that can be obtained in a single operation.
+         * @param mixed $default Default value to return for keys that do not exist.
+         * @return iterable<string, mixed> A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value.
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         *   MUST be thrown if $keys is neither an array nor a Traversable,
+         *   or if any of the $keys are not a legal value.
+         * @static 
+         */
+        public static function getMultiple($keys, $default = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->getMultiple($keys, $default);
+        }
+
+        /**
+         * Retrieve an item from the cache and delete it.
+         *
+         * @param array|string $key
+         * @param mixed $default
+         * @return mixed 
+         * @static 
+         */
+        public static function pull($key, $default = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->pull($key, $default);
+        }
+
+        /**
+         * Store an item in the cache.
+         *
+         * @param array|string $key
+         * @param mixed $value
+         * @param \DateTimeInterface|\DateInterval|int|null $ttl
+         * @return bool 
+         * @static 
+         */
+        public static function put($key, $value, $ttl = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->put($key, $value, $ttl);
+        }
+
+        /**
+         * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
+         *
+         * @return bool 
+         * @param string $key The key of the item to store.
+         * @param mixed $value The value of the item to store, must be serializable.
+         * @param null|int|\DateInterval $ttl Optional. The TTL value of this item. If no value is sent and
+         *                                      the driver supports TTL then the library may set a default value
+         *                                      for it or let the driver take care of that.
+         * @return bool True on success and false on failure.
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         *   MUST be thrown if the $key string is not a legal value.
+         * @static 
+         */
+        public static function set($key, $value, $ttl = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->set($key, $value, $ttl);
+        }
+
+        /**
+         * Store multiple items in the cache for a given number of seconds.
+         *
+         * @param array $values
+         * @param \DateTimeInterface|\DateInterval|int|null $ttl
+         * @return bool 
+         * @static 
+         */
+        public static function putMany($values, $ttl = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->putMany($values, $ttl);
+        }
+
+        /**
+         * Persists a set of key => value pairs in the cache, with an optional TTL.
+         *
+         * @return bool 
+         * @param iterable $values A list of key => value pairs for a multiple-set operation.
+         * @param null|int|\DateInterval $ttl Optional. The TTL value of this item. If no value is sent and
+         *                                       the driver supports TTL then the library may set a default value
+         *                                       for it or let the driver take care of that.
+         * @return bool True on success and false on failure.
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         *   MUST be thrown if $values is neither an array nor a Traversable,
+         *   or if any of the $values are not a legal value.
+         * @static 
+         */
+        public static function setMultiple($values, $ttl = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->setMultiple($values, $ttl);
+        }
+
+        /**
+         * Store an item in the cache if the key does not exist.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @param \DateTimeInterface|\DateInterval|int|null $ttl
+         * @return bool 
+         * @static 
+         */
+        public static function add($key, $value, $ttl = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->add($key, $value, $ttl);
+        }
+
+        /**
+         * Increment the value of an item in the cache.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @return int|bool 
+         * @static 
+         */
+        public static function increment($key, $value = 1)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->increment($key, $value);
+        }
+
+        /**
+         * Decrement the value of an item in the cache.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @return int|bool 
+         * @static 
+         */
+        public static function decrement($key, $value = 1)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->decrement($key, $value);
+        }
+
+        /**
+         * Store an item in the cache indefinitely.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @return bool 
+         * @static 
+         */
+        public static function forever($key, $value)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->forever($key, $value);
+        }
+
+        /**
+         * Get an item from the cache, or execute the given Closure and store the result.
+         *
+         * @template TCacheValue
+         * @param string $key
+         * @param \Closure|\DateTimeInterface|\DateInterval|int|null $ttl
+         * @param \Closure():  TCacheValue  $callback
+         * @return TCacheValue 
+         * @static 
+         */
+        public static function remember($key, $ttl, $callback)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->remember($key, $ttl, $callback);
+        }
+
+        /**
+         * Get an item from the cache, or execute the given Closure and store the result forever.
+         *
+         * @template TCacheValue
+         * @param string $key
+         * @param \Closure():  TCacheValue  $callback
+         * @return TCacheValue 
+         * @static 
+         */
+        public static function sear($key, $callback)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->sear($key, $callback);
+        }
+
+        /**
+         * Get an item from the cache, or execute the given Closure and store the result forever.
+         *
+         * @template TCacheValue
+         * @param string $key
+         * @param \Closure():  TCacheValue  $callback
+         * @return TCacheValue 
+         * @static 
+         */
+        public static function rememberForever($key, $callback)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->rememberForever($key, $callback);
+        }
+
+        /**
+         * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
+         *
+         * @template TCacheValue
+         * @param string $key
+         * @param array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int } $ttl
+         * @param (callable(): TCacheValue) $callback
+         * @param array{ seconds?: int, owner?: string }|null $lock
+         * @return TCacheValue 
+         * @static 
+         */
+        public static function flexible($key, $ttl, $callback, $lock = null)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->flexible($key, $ttl, $callback, $lock);
+        }
+
+        /**
+         * Remove an item from the cache.
+         *
+         * @param string $key
+         * @return bool 
+         * @static 
+         */
+        public static function forget($key)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->forget($key);
+        }
+
+        /**
+         * Delete an item from the cache by its unique key.
+         *
+         * @return bool 
+         * @param string $key The unique cache key of the item to delete.
+         * @return bool True if the item was successfully removed. False if there was an error.
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         *   MUST be thrown if the $key string is not a legal value.
+         * @static 
+         */
+        public static function delete($key)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->delete($key);
+        }
+
+        /**
+         * Deletes multiple cache items in a single operation.
+         *
+         * @return bool 
+         * @param iterable<string> $keys A list of string-based keys to be deleted.
+         * @return bool True if the items were successfully removed. False if there was an error.
+         * @throws \Psr\SimpleCache\InvalidArgumentException
+         *   MUST be thrown if $keys is neither an array nor a Traversable,
+         *   or if any of the $keys are not a legal value.
+         * @static 
+         */
+        public static function deleteMultiple($keys)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->deleteMultiple($keys);
+        }
+
+        /**
+         * Wipes clean the entire cache's keys.
+         *
+         * @return bool 
+         * @return bool True on success and false on failure.
+         * @static 
+         */
+        public static function clear()
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->clear();
+        }
+
+        /**
+         * Begin executing a new tags operation if the store supports it.
+         *
+         * @param array|mixed $names
+         * @return \Illuminate\Cache\TaggedCache 
+         * @throws \BadMethodCallException
+         * @static 
+         */
+        public static function tags($names)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->tags($names);
+        }
+
+        /**
+         * Get the name of the cache store.
+         *
+         * @return string|null 
+         * @static 
+         */
+        public static function getName()
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->getName();
+        }
+
+        /**
+         * Determine if the current store supports tags.
+         *
+         * @return bool 
+         * @static 
+         */
+        public static function supportsTags()
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->supportsTags();
+        }
+
+        /**
+         * Get the default cache time.
+         *
+         * @return int|null 
+         * @static 
+         */
+        public static function getDefaultCacheTime()
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->getDefaultCacheTime();
+        }
+
+        /**
+         * Set the default cache time in seconds.
+         *
+         * @param int|null $seconds
+         * @return \Illuminate\Cache\Repository 
+         * @static 
+         */
+        public static function setDefaultCacheTime($seconds)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->setDefaultCacheTime($seconds);
+        }
+
+        /**
+         * Get the cache store implementation.
+         *
+         * @return \Illuminate\Contracts\Cache\Store 
+         * @static 
+         */
+        public static function getStore()
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->getStore();
+        }
+
+        /**
+         * Set the cache store implementation.
+         *
+         * @param \Illuminate\Contracts\Cache\Store $store
+         * @return static 
+         * @static 
+         */
+        public static function setStore($store)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->setStore($store);
+        }
+
+        /**
+         * Get the event dispatcher instance.
+         *
+         * @return \Illuminate\Contracts\Events\Dispatcher|null 
+         * @static 
+         */
+        public static function getEventDispatcher()
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->getEventDispatcher();
+        }
+
+        /**
+         * Set the event dispatcher instance.
+         *
+         * @param \Illuminate\Contracts\Events\Dispatcher $events
+         * @return void 
+         * @static 
+         */
+        public static function setEventDispatcher($events)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            $instance->setEventDispatcher($events);
+        }
+
+        /**
+         * Determine if a cached value exists.
+         *
+         * @param string $key
+         * @return bool 
+         * @static 
+         */
+        public static function offsetExists($key)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->offsetExists($key);
+        }
+
+        /**
+         * Retrieve an item from the cache by key.
+         *
+         * @param string $key
+         * @return mixed 
+         * @static 
+         */
+        public static function offsetGet($key)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->offsetGet($key);
+        }
+
+        /**
+         * Store an item in the cache for the default time.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @return void 
+         * @static 
+         */
+        public static function offsetSet($key, $value)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            $instance->offsetSet($key, $value);
+        }
+
+        /**
+         * Remove an item from the cache.
+         *
+         * @param string $key
+         * @return void 
+         * @static 
+         */
+        public static function offsetUnset($key)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            $instance->offsetUnset($key);
+        }
+
+        /**
+         * Register a custom macro.
+         *
+         * @param string $name
+         * @param object|callable $macro
+         * @param-closure-this static  $macro
+         * @return void 
+         * @static 
+         */
+        public static function macro($name, $macro)
+        {
+            \Illuminate\Cache\Repository::macro($name, $macro);
+        }
+
+        /**
+         * Mix another object into the class.
+         *
+         * @param object $mixin
+         * @param bool $replace
+         * @return void 
+         * @throws \ReflectionException
+         * @static 
+         */
+        public static function mixin($mixin, $replace = true)
+        {
+            \Illuminate\Cache\Repository::mixin($mixin, $replace);
+        }
+
+        /**
+         * Checks if macro is registered.
+         *
+         * @param string $name
+         * @return bool 
+         * @static 
+         */
+        public static function hasMacro($name)
+        {
+            return \Illuminate\Cache\Repository::hasMacro($name);
+        }
+
+        /**
+         * Flush the existing macros.
+         *
+         * @return void 
+         * @static 
+         */
+        public static function flushMacros()
+        {
+            \Illuminate\Cache\Repository::flushMacros();
+        }
+
+        /**
+         * Dynamically handle calls to the class.
+         *
+         * @param string $method
+         * @param array $parameters
+         * @return mixed 
+         * @throws \BadMethodCallException
+         * @static 
+         */
+        public static function macroCall($method, $parameters)
+        {
+            /** @var \Illuminate\Cache\Repository $instance */
+            return $instance->macroCall($method, $parameters);
+        }
+
+        /**
+         * Get a lock instance.
+         *
+         * @param string $name
+         * @param int $seconds
+         * @param string|null $owner
+         * @return \Illuminate\Contracts\Cache\Lock 
+         * @static 
+         */
+        public static function lock($name, $seconds = 0, $owner = null)
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->lock($name, $seconds, $owner);
+        }
+
+        /**
+         * Restore a lock instance using the owner identifier.
+         *
+         * @param string $name
+         * @param string $owner
+         * @return \Illuminate\Contracts\Cache\Lock 
+         * @static 
+         */
+        public static function restoreLock($name, $owner)
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->restoreLock($name, $owner);
+        }
+
+        /**
+         * Remove an item from the cache if it is expired.
+         *
+         * @param string $key
+         * @return bool 
+         * @static 
+         */
+        public static function forgetIfExpired($key)
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->forgetIfExpired($key);
+        }
+
+        /**
+         * Remove all items from the cache.
+         *
+         * @return bool 
+         * @static 
+         */
+        public static function flush()
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->flush();
+        }
+
+        /**
+         * Get the underlying database connection.
+         *
+         * @return \Illuminate\Database\MySqlConnection 
+         * @static 
+         */
+        public static function getConnection()
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->getConnection();
+        }
+
+        /**
+         * Specify the name of the connection that should be used to manage locks.
+         *
+         * @param \Illuminate\Database\ConnectionInterface $connection
+         * @return \Illuminate\Cache\DatabaseStore 
+         * @static 
+         */
+        public static function setLockConnection($connection)
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->setLockConnection($connection);
+        }
+
+        /**
+         * Get the cache key prefix.
+         *
+         * @return string 
+         * @static 
+         */
+        public static function getPrefix()
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            return $instance->getPrefix();
+        }
+
+        /**
+         * Set the cache key prefix.
+         *
+         * @param string $prefix
+         * @return void 
+         * @static 
+         */
+        public static function setPrefix($prefix)
+        {
+            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            $instance->setPrefix($prefix);
         }
 
             }
@@ -12543,6 +13174,207 @@ namespace Illuminate\Support\Facades {
             //Method inherited from \Illuminate\Queue\Queue 
             /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->setContainer($container);
+        }
+
+            }
+    /**
+     * 
+     *
+     * @see \Illuminate\Cache\RateLimiter
+     */
+    class RateLimiter {
+        /**
+         * Register a named limiter configuration.
+         *
+         * @param \BackedEnum|\UnitEnum|string $name
+         * @param \Closure $callback
+         * @return \Illuminate\Cache\RateLimiter 
+         * @static 
+         */
+        public static function for($name, $callback)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->for($name, $callback);
+        }
+
+        /**
+         * Get the given named rate limiter.
+         *
+         * @param \BackedEnum|\UnitEnum|string $name
+         * @return \Closure|null 
+         * @static 
+         */
+        public static function limiter($name)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->limiter($name);
+        }
+
+        /**
+         * Attempts to execute a callback if it's not limited.
+         *
+         * @param string $key
+         * @param int $maxAttempts
+         * @param \Closure $callback
+         * @param \DateTimeInterface|\DateInterval|int $decaySeconds
+         * @return mixed 
+         * @static 
+         */
+        public static function attempt($key, $maxAttempts, $callback, $decaySeconds = 60)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->attempt($key, $maxAttempts, $callback, $decaySeconds);
+        }
+
+        /**
+         * Determine if the given key has been "accessed" too many times.
+         *
+         * @param string $key
+         * @param int $maxAttempts
+         * @return bool 
+         * @static 
+         */
+        public static function tooManyAttempts($key, $maxAttempts)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->tooManyAttempts($key, $maxAttempts);
+        }
+
+        /**
+         * Increment (by 1) the counter for a given key for a given decay time.
+         *
+         * @param string $key
+         * @param \DateTimeInterface|\DateInterval|int $decaySeconds
+         * @return int 
+         * @static 
+         */
+        public static function hit($key, $decaySeconds = 60)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->hit($key, $decaySeconds);
+        }
+
+        /**
+         * Increment the counter for a given key for a given decay time by a given amount.
+         *
+         * @param string $key
+         * @param \DateTimeInterface|\DateInterval|int $decaySeconds
+         * @param int $amount
+         * @return int 
+         * @static 
+         */
+        public static function increment($key, $decaySeconds = 60, $amount = 1)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->increment($key, $decaySeconds, $amount);
+        }
+
+        /**
+         * Decrement the counter for a given key for a given decay time by a given amount.
+         *
+         * @param string $key
+         * @param \DateTimeInterface|\DateInterval|int $decaySeconds
+         * @param int $amount
+         * @return int 
+         * @static 
+         */
+        public static function decrement($key, $decaySeconds = 60, $amount = 1)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->decrement($key, $decaySeconds, $amount);
+        }
+
+        /**
+         * Get the number of attempts for the given key.
+         *
+         * @param string $key
+         * @return mixed 
+         * @static 
+         */
+        public static function attempts($key)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->attempts($key);
+        }
+
+        /**
+         * Reset the number of attempts for the given key.
+         *
+         * @param string $key
+         * @return mixed 
+         * @static 
+         */
+        public static function resetAttempts($key)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->resetAttempts($key);
+        }
+
+        /**
+         * Get the number of retries left for the given key.
+         *
+         * @param string $key
+         * @param int $maxAttempts
+         * @return int 
+         * @static 
+         */
+        public static function remaining($key, $maxAttempts)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->remaining($key, $maxAttempts);
+        }
+
+        /**
+         * Get the number of retries left for the given key.
+         *
+         * @param string $key
+         * @param int $maxAttempts
+         * @return int 
+         * @static 
+         */
+        public static function retriesLeft($key, $maxAttempts)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->retriesLeft($key, $maxAttempts);
+        }
+
+        /**
+         * Clear the hits and lockout timer for the given key.
+         *
+         * @param string $key
+         * @return void 
+         * @static 
+         */
+        public static function clear($key)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            $instance->clear($key);
+        }
+
+        /**
+         * Get the number of seconds until the "key" is accessible again.
+         *
+         * @param string $key
+         * @return int 
+         * @static 
+         */
+        public static function availableIn($key)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->availableIn($key);
+        }
+
+        /**
+         * Clean the rate limiter key from unicode characters.
+         *
+         * @param string $key
+         * @return string 
+         * @static 
+         */
+        public static function cleanRateLimiterKey($key)
+        {
+            /** @var \Illuminate\Cache\RateLimiter $instance */
+            return $instance->cleanRateLimiterKey($key);
         }
 
             }
@@ -21944,6 +22776,36 @@ namespace Illuminate\Routing {
         }
 
             }
+    /**
+     * 
+     *
+     */
+    class Route {
+        /**
+         * 
+         *
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $roles
+         * @static 
+         */
+        public static function role($roles = [])
+        {
+            return \Illuminate\Routing\Route::role($roles);
+        }
+
+        /**
+         * 
+         *
+         * @see \Spatie\Permission\PermissionServiceProvider::registerMacroHelpers()
+         * @param mixed $permissions
+         * @static 
+         */
+        public static function permission($permissions = [])
+        {
+            return \Illuminate\Routing\Route::permission($permissions);
+        }
+
+            }
     }
 
 namespace Illuminate\Testing {
@@ -26755,6 +27617,7 @@ namespace  {
     class Password extends \Illuminate\Support\Facades\Password {}
     class Process extends \Illuminate\Support\Facades\Process {}
     class Queue extends \Illuminate\Support\Facades\Queue {}
+    class RateLimiter extends \Illuminate\Support\Facades\RateLimiter {}
     class Redirect extends \Illuminate\Support\Facades\Redirect {}
     class Request extends \Illuminate\Support\Facades\Request {}
     class Response extends \Illuminate\Support\Facades\Response {}

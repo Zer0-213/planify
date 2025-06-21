@@ -11,19 +11,41 @@ use Spatie\Permission\Models\Role;
 
 /**
  * Class CompanyInvite
- *
+ * 
  * Represents an invitation to join a company.
  *
  * @property int $id
  * @property int $company_id
  * @property string $email
+ * @property string|null $phone_number
  * @property string $name
  * @property string $token
+ * @property int|null $wage
+ * @property int $role_id
  * @property int $invited_by
  * @property Carbon|null $expires_at
- * @property string|null $phone_number
- *
- * @mixin Builder
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read \App\Models\Company $company
+ * @property-read \App\Models\User $inviter
+ * @property-read Role $role
+ * @method static \Database\Factories\CompanyInviteFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereInvitedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite wherePhoneNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereRoleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CompanyInvite whereWage($value)
+ * @mixin \Eloquent
  */
 class CompanyInvite extends Model
 {

@@ -3,12 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import StaffForm from '@/pages/staff/partials/staffForm/StaffForm.vue';
 import { StaffFormData } from '@/pages/staff/types/staffFormData';
+import { Role } from '@/types/role';
 import { useForm } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
 import { toast } from 'vue-sonner';
 
 defineProps<{
-    roles: string[];
+    roles: Role[];
 }>();
 
 const form = useForm<StaffFormData>({

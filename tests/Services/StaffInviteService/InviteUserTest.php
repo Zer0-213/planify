@@ -1,6 +1,6 @@
 <?php
 
-namespace Services\StaffService;
+namespace Services\StaffInviteService;
 
 use App\Models\CompanyInvite;
 use App\Models\CompanyUser;

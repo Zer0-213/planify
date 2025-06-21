@@ -2,8 +2,9 @@
 import AppTable from '@/components/AppTable.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AddStaffDialog from '@/pages/staff/partials/AddStaffDialog.vue';
-import { columns } from '@/pages/staff/table/columns';
+import { createColumns } from '@/pages/staff/table/columns';
 import { StaffProps } from '@/pages/staff/types/staffProps';
+import { Role } from '@/types/role';
 import { usePage } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
 
@@ -11,10 +12,12 @@ const breadcrumbs = [{ title: 'Staff', href: '/staff' }];
 
 const props = defineProps<{
     staffMembers: StaffProps[];
-    roles: string[];
+    roles: Role[];
 }>();
 
 const permissions = usePage().props?.auth?.permissions as string[];
+const user = usePage().props?.auth?.user;
+
 const canCreateStaff = permissions.includes('create_user');
 
 const { staffMembers } = props;
@@ -23,11 +26,14 @@ const { staffMembers } = props;
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-6">
-            <h1 class="mb-4 text-2xl font-bold">Staff Management</h1>
-            <p>Manage your staff members here.</p>
+            <h1 class="mb-4 text-2xl font-bold">Staff List</h1>
             <section class="mt-6 w-full">
                 <AddStaffDialog v-if="canCreateStaff" :roles="roles" />
-                <AppTable :columns="columns" :data="staffMembers" table-title="Staff List" />
+                <AppTable
+                    :columns="createColumns(user?.id, permissions.includes('view_all_wages'), roles)"
+                    :data="staffMembers"
+                    table-title="Staff List"
+                />
             </section>
         </div>
     </AppLayout>

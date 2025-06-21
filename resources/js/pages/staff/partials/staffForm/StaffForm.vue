@@ -3,12 +3,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { StaffFormData } from '@/pages/staff/types/staffFormData';
+import { Role } from '@/types/role';
 import { useForm } from '@inertiajs/vue3';
 import { defineEmits, defineProps, reactive, watch } from 'vue';
 
 const props = defineProps<{
     form: ReturnType<typeof useForm<StaffFormData>>;
-    roles: string[];
+    roles: Role[];
 }>();
 
 const emit = defineEmits<{
@@ -68,8 +69,8 @@ watch(
             <SelectContent>
                 <SelectGroup>
                     <SelectLabel>Roles</SelectLabel>
-                    <SelectItem v-for="role in roles" :key="role" :value="role">
-                        {{ role }}
+                    <SelectItem v-for="role in roles" :key="role.id" :value="role.id">
+                        {{ role.name }}
                     </SelectItem>
                 </SelectGroup>
             </SelectContent>

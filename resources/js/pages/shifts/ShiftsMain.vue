@@ -54,6 +54,8 @@ const publishShifts = () => {
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="space-y-8 p-6">
+            <h1 class="mb-4 text-2xl font-bold">Staff Rota</h1>
+
             <div v-if="canCreateShifts" class="flex justify-end">
                 <Button :disabled="!hasChanged" @click="publishShifts">Publish</Button>
                 <Button :disabled="!hasChanged" class="ml-2" variant="secondary" @click="resetShifts">Cancel</Button>

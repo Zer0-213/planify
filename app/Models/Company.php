@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property Carbon|null $created_at
@@ -23,11 +23,16 @@ use Spatie\Permission\Models\Role;
  * @property int $owner_id
  * @property string|null $phone_number
  * @property string $type
- * @property-read User|null $owner
- * @property-read Collection<int, Role> $roles
- * @property-read int|null $roles_count
- * @property-read Collection<int, CompanyUser> $users
+ * @property-read Collection<int, \App\Models\CompanyUser> $companyUsers
+ * @property-read int|null $company_users_count
+ * @property-read Collection<int, \App\Models\CompanyUser> $companyUsersWithShifts
+ * @property-read int|null $company_users_with_shifts_count
+ * @property-read Collection<int, \App\Models\CompanyInvite> $invites
+ * @property-read int|null $invites_count
+ * @property-read \App\Models\User|null $owner
+ * @property-read Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ * @method static \Database\Factories\CompanyFactory factory($count = null, $state = [])
  * @method static Builder<static>|Company newModelQuery()
  * @method static Builder<static>|Company newQuery()
  * @method static Builder<static>|Company query()
