@@ -34,9 +34,7 @@ const user = usePage<{
 
 <template>
     <Dialog>
-        <DialogTrigger>
-            <Button as-child class="w-full text-blue-500 underline" variant="ghost">Edit</Button>
-        </DialogTrigger>
+        <DialogTrigger class="cursor-pointer text-blue-500 underline"> Edit</DialogTrigger>
         <DialogContent>
             <DialogTitle>Edit</DialogTitle>
             <DialogDescription>Edit {{ staffName }}</DialogDescription>
