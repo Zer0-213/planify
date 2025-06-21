@@ -10,7 +10,7 @@ import { defineProps } from 'vue';
 
 const breadcrumbs = [{ title: 'Staff', href: '/staff' }];
 
-const props = defineProps<{
+defineProps<{
     staffMembers: StaffProps[];
     roles: Role[];
 }>();
@@ -19,8 +19,6 @@ const permissions = usePage().props?.auth?.permissions as string[];
 const user = usePage().props?.auth?.user;
 
 const canCreateStaff = permissions.includes('create_user');
-
-const { staffMembers } = props;
 </script>
 
 <template>

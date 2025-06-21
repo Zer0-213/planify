@@ -49,14 +49,14 @@ readonly class StaffService
      * @param array $data
      * @return bool
      */
-    public function updateStaffMember(int $id, array $data): bool
+    public function updateStaffMember(int $id, array $data): void
     {
         $companyUser = $this->companyUser
             ->with(['roles', 'company'])
             ->find($id);
 
         if (!$companyUser) {
-            return false;
+            return;
         }
 
         if (isset($data['wage']) && $companyUser->wage !== $data['wage'] * 100) {
@@ -87,7 +87,7 @@ readonly class StaffService
             }
         }
 
-        return $companyUser->save();
+        $companyUser->save();
     }
 
 
