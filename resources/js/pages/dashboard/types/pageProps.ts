@@ -3,6 +3,7 @@ import { User } from '@/types';
 export type PageProp = {
     auth: {
         user: User;
+        permissions: string[];
     };
     todayShift: {
         start_time: string;

@@ -2,6 +2,7 @@
 import { ArrowButton, Button } from '@/components/ui/button';
 import { WeekPicker } from '@/components/ui/week-picker';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { PageProp } from '@/pages/dashboard/types/pageProps';
 import { useShiftsComposition } from '@/pages/shifts/composables/useShiftsComposition';
 import { UserShift } from '@/pages/shifts/types/shiftTypes';
 import { router, usePage } from '@inertiajs/vue3';
@@ -14,7 +15,8 @@ const props = defineProps<{
     shifts: UserShift[];
     week: string;
 }>();
-const permissions = usePage().props?.auth?.permissions as string[];
+
+const permissions = usePage<PageProp>().props?.auth?.permissions as string[];
 const canCreateShifts = permissions.includes('create_shifts');
 
 const breadcrumbs = [{ title: 'Shift', href: '/shifts' }];

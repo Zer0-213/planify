@@ -22,18 +22,26 @@ class CompanyShiftsService
             ])
             ->get()
             ->map(function ($companyUser) {
+                $shifts = $companyUser->shifts->map(function ($shift) {
+                    return [
+                        'id' => $shift?->id,
+                        'starts_at' => $shift->starts_at?->toIso8601String(),
+                        'ends_at' => $shift->ends_at?->toIso8601String(),
+                        'shift_date' => $shift?->shift_date?->toIso8601String(),
+                        'duration_in_minutes' => $shift->starts_at && $shift->ends_at
+                            ? $shift->ends_at->diffInMinutes($shift->starts_at)
+                            : 0,
+                    ];
+                });
+
+                $totalMinutes = $shifts->sum('duration_in_minutes');
+
                 return [
                     'user_id' => $companyUser->user->id,
                     'name' => $companyUser->user->name,
-                    'shifts' => $companyUser->shifts->map(function ($shift) {
-                        return [
-                            'id' => $shift?->id,
-                            'starts_at' => $shift->starts_at?->toIso8601String(),
-                            'ends_at' => $shift->ends_at?->toIso8601String(),
-                            'shift_date' => $shift?->shift_date?->toIso8601String(),
-                            // Optionally: include role, location, etc.
-                        ];
-                    }),
+                    'total_minutes' => $totalMinutes,
+                    'total_hours' => round($totalMinutes / 60, 2),
+                    'shifts' => $shifts,
                 ];
             })
             ->toArray();

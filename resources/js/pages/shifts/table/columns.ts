@@ -49,5 +49,8 @@ export function createShiftColumns(options?: ColumnOptions) {
                 },
             }),
         ),
+        columnHelper.accessor((row) => `${row.total_hours}:${row.total_minutes}`, {
+            header: 'Total Hours',
+        }),
     ];
 }
