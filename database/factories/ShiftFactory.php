@@ -30,6 +30,7 @@ class ShiftFactory extends Factory
                 'company_user_id' => $companyUser->id,
                 'starts_at' => $shift['starts_at'],
                 'ends_at' => $shift['ends_at'],
+                'shift_date' => $shift['shift_date'],
             ]);
         }
 
@@ -53,8 +54,9 @@ class ShiftFactory extends Factory
             'location' => $this->faker->optional()->address(),
             'notes' => $this->faker->optional()->sentence(),
             'status' => $this->faker->randomElement(["scheduled", "completed", "cancelled"]),
+            'shift_date' => Carbon::now(),
         ];
     }
-    
+
 
 }

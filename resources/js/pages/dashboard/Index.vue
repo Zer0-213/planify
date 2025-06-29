@@ -6,9 +6,10 @@ import TodaysShift from '@/pages/dashboard/partials/TodaysShift.vue';
 import UpcomingShifts from '@/pages/dashboard/partials/UpcomingShifts.vue';
 import WeeklyOverview from '@/pages/dashboard/partials/WeeklyOverview.vue';
 import { PageProp } from '@/pages/dashboard/types/pageProps';
+import { ShiftTime } from '@/pages/shifts/types/shiftTypes';
 import { type BreadcrumbItem, User } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, defineProps } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,9 +19,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const page = usePage<PageProp>();
+const props = defineProps<{
+    todayShift: ShiftTime;
+}>();
+
+console.log(props.todayShift);
 
 const user = computed(() => page.props.auth.user as User).value;
-const todayShift = computed(() => page.props.todayShift || null).value;
 const upcomingShifts = [
     {
         id: 1,

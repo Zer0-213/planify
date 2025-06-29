@@ -48,6 +48,10 @@ const publishShifts = () => {
             onSuccess: () => {
                 toast.success('Shifts saved successfully');
             },
+            onError: (e) => {
+                console.log(shifts.value);
+                console.error(e);
+            },
         },
     );
 };

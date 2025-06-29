@@ -3,20 +3,21 @@
 namespace App\Services;
 
 use App\Models\Company;
+use App\Models\CompanyUser;
 use App\Models\Shift;
 use Carbon\Carbon;
 
-class CompanyShiftsService
+class ShiftService
 {
-    public function getShiftsForWeek(Company $company, Carbon $startWeek, Carbon $endWeek): array
+    public function getShifts(Company $company, Carbon $startDay, Carbon $endDay): array
     {
         return $company->companyUsers()
             ->with([
                 'user',
-                'shifts' => function ($query) use ($startWeek, $endWeek) {
+                'shifts' => function ($query) use ($startDay, $endDay) {
                     $query->whereBetween('shift_date', [
-                        $startWeek->copy()->startOfDay(),
-                        $endWeek->copy()->endOfDay()
+                        $startDay->copy()->startOfDay(),
+                        $endDay->copy()->endOfDay()
                     ]);
                 }
             ])
@@ -47,6 +48,15 @@ class CompanyShiftsService
             ->toArray();
     }
 
+    public function getShiftByCompanyUser(CompanyUser $companyUser, Carbon $startDay, Carbon $endDay)
+    {
+        return $companyUser->shifts()->where('company_user_id', $companyUser->id)
+            ->whereBetween('shift_date', [
+                $startDay->copy()->startOfDay(),
+                $endDay->copy()->endOfDay()
+            ])
+            ->first();
+    }
 
     public function upsertShifts(array $shifts, Shift $shiftModel, Company $company): void
     {

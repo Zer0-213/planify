@@ -5,7 +5,7 @@ namespace Tests\Services;
 use App\Models\Company;
 use App\Models\Shift;
 use App\Models\User;
-use App\Services\CompanyShiftsService;
+use App\Services\ShiftService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -16,9 +16,9 @@ class CompanyShiftsServiceTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * @var CompanyShiftsService
+     * @var ShiftService
      */
-    private CompanyShiftsService $service;
+    private ShiftService $service;
 
     #[Test]
     public function it_upserts_shifts_for_a_given_company()
@@ -183,7 +183,7 @@ class CompanyShiftsServiceTest extends TestCase
         $endWeek = Carbon::parse('2023-10-29');
 
         // Act
-        $result = $this->service->getShiftsForWeek($company, $startWeek, $endWeek);
+        $result = $this->service->getShifts($company, $startWeek, $endWeek);
 
         // Assert
         $this->assertCount(1, $result);
@@ -206,7 +206,7 @@ class CompanyShiftsServiceTest extends TestCase
         $endWeek = Carbon::parse('2023-10-29');
 
         // Act
-        $result = $this->service->getShiftsForWeek($company, $startWeek, $endWeek);
+        $result = $this->service->getShifts($company, $startWeek, $endWeek);
 
         // Assert
         $this->assertEmpty($result);
@@ -242,7 +242,7 @@ class CompanyShiftsServiceTest extends TestCase
         $endWeek = Carbon::parse('2023-10-29');
 
         // Act
-        $result = $this->service->getShiftsForWeek($company, $startWeek, $endWeek);
+        $result = $this->service->getShifts($company, $startWeek, $endWeek);
 
         // Assert
         $this->assertCount(1, $result[0]['shifts']);
@@ -252,6 +252,6 @@ class CompanyShiftsServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new CompanyShiftsService();
+        $this->service = new ShiftService();
     }
 }

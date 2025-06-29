@@ -6,7 +6,7 @@ use App\Http\Requests\StoreShiftsRequest;
 use App\Models\Company;
 use App\Models\Shift;
 use App\Models\User;
-use App\Services\CompanyShiftsService;
+use App\Services\ShiftService;
 use Carbon\CarbonInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +16,7 @@ use Inertia\Response;
 
 class ShiftsController extends Controller
 {
-    public function __construct(private readonly CompanyShiftsService $companyShiftsService)
+    public function __construct(private readonly ShiftService $companyShiftsService)
     {
     }
 
@@ -36,7 +36,7 @@ class ShiftsController extends Controller
 
         $weekEnd = $weekStart->copy()->endOfWeek(CarbonInterface::SUNDAY);
 
-        $shifts = $this->companyShiftsService->getShiftsForWeek($company, $weekStart, $weekEnd);
+        $shifts = $this->companyShiftsService->getShifts($company, $weekStart, $weekEnd);
 
         return Inertia::render('shifts/ShiftsMain', [
             'shifts' => $shifts,

@@ -1,9 +1,12 @@
 // resources/js/pages/shifts/utils/shiftTimeUtils.ts
 import { format, parseISO } from 'date-fns';
 
-export function formatShiftTime(isoTime: string | null | undefined): string {
+type Format = string;
+
+export function formatShiftTime(isoTime: string | null | undefined, formatString?: Format): string {
     if (!isoTime) return '';
-    return format(parseISO(isoTime), 'yyyy-MM-dd HH:mm:ss');
+
+    return format(parseISO(isoTime), formatString || 'yyyy-MM-dd HH:mm:ss');
 }
 
 export function extractTimeFromIso(isoString?: string): string {

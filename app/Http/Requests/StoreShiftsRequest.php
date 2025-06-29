@@ -25,7 +25,7 @@ class StoreShiftsRequest extends FormRequest
         return [
             'shifts' => 'required|array',
             'shifts.*.user_id' => 'required|integer|exists:users,id',
-            'shifts.*.shifts' => 'required|array',
+            'shifts.*.shifts' => 'present|array',
             'week' => 'required|date_format:Y-m-d',
         ];
     }
