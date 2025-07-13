@@ -10,7 +10,7 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __construct(private ShiftService $shiftService)
+    public function __construct(private readonly ShiftService $shiftService)
     {
 
     }
@@ -22,9 +22,12 @@ class DashboardController extends Controller
             throw new UnauthorizedException();
         }
 
-        $todayShift = $this->shiftService->getShiftByCompanyUser($companyUser, Carbon::today(), Carbon::today());
+        $todayShift = $this->shiftService->getShifts($companyUser->company, Carbon::today()->startOfDay(), Carbon::today()->endOfDay(), $companyUser->id);
+        $upcomingShifts = $this->shiftService->getShifts($companyUser->company, Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek(), $companyUser->id);
+
         return Inertia::render("dashboard/Index", [
-                'todayShift' => $todayShift
+                'todayShift' => $todayShift[0],
+                'upcomingShifts' => $upcomingShifts[0],
             ]
         );
     }

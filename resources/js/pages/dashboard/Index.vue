@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import AppLayout from '@/layouts/AppLayout.vue';
+import CurrentWeekShifts from '@/pages/dashboard/partials/CurrentWeekShifts.vue';
 import Greeting from '@/pages/dashboard/partials/Greeting.vue';
 import QuickActions from '@/pages/dashboard/partials/QuickActions.vue';
 import TodaysShift from '@/pages/dashboard/partials/TodaysShift.vue';
-import UpcomingShifts from '@/pages/dashboard/partials/UpcomingShifts.vue';
-import WeeklyOverview from '@/pages/dashboard/partials/WeeklyOverview.vue';
 import { PageProp } from '@/pages/dashboard/types/pageProps';
-import { ShiftTime } from '@/pages/shifts/types/shiftTypes';
+import { UserShift } from '@/pages/shifts/types/shiftTypes';
 import { type BreadcrumbItem, User } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed, defineProps } from 'vue';
@@ -19,49 +18,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const page = usePage<PageProp>();
-const props = defineProps<{
-    todayShift: ShiftTime;
+defineProps<{
+    todayShift: UserShift;
+    upcomingShifts: UserShift;
 }>();
 
-console.log(props.todayShift);
-
 const user = computed(() => page.props.auth.user as User).value;
-const upcomingShifts = [
-    {
-        id: 1,
-        date: '2024-03-15',
-        start_time: '09:00',
-        end_time: '17:00',
-        role: 'Cashier',
-    },
-    {
-        id: 2,
-        date: '2024-03-16',
-        start_time: '10:00',
-        end_time: '18:00',
-        role: 'Burgers',
-    },
-    {
-        id: 3,
-        date: '2024-03-18',
-        start_time: '08:00',
-        end_time: '16:00',
-        role: 'Fries',
-    },
-];
-
-const weeklyOverview = computed(
-    () =>
-        page.props.weeklyOverview || [
-            { day: 'Mon', shift: '9-5' },
-            { day: 'Tue', shift: 'Off' },
-            { day: 'Wed', shift: '9-1' },
-            { day: 'Thu', shift: 'Off' },
-            { day: 'Fri', shift: 'Off' },
-            { day: 'Sat', shift: '12-8' },
-            { day: 'Sun', shift: 'Off' },
-        ],
-).value;
 </script>
 
 <template>
@@ -77,13 +39,10 @@ const weeklyOverview = computed(
                 <QuickActions />
             </section>
             <section class="flex w-full flex-col items-center justify-center">
-                <TodaysShift :shift="todayShift" />
-            </section>
-            <section class="flex justify-center">
-                <UpcomingShifts :upcomingShifts="upcomingShifts" />
+                <TodaysShift :shift="todayShift.shifts" />
             </section>
             <section class="rounded-xl bg-white p-6 shadow">
-                <WeeklyOverview :weeklyOverview="weeklyOverview" />
+                <CurrentWeekShifts :weeklyOverview="upcomingShifts.shifts" />
             </section>
         </div>
     </AppLayout>

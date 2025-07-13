@@ -3,13 +3,12 @@
 namespace App\Services;
 
 use App\Models\Company;
-use App\Models\CompanyUser;
 use App\Models\Shift;
 use Carbon\Carbon;
 
 class ShiftService
 {
-    public function getShifts(Company $company, Carbon $startDay, Carbon $endDay): array
+    public function getShifts(Company $company, Carbon $startDay, Carbon $endDay, ?int $companyUserId = null): array
     {
         return $company->companyUsers()
             ->with([
@@ -21,41 +20,44 @@ class ShiftService
                     ]);
                 }
             ])
+            ->when($companyUserId, function ($query) use ($companyUserId) {
+                $query->where('company_users.id', $companyUserId);
+            })
             ->get()
-            ->map(function ($companyUser) {
-                $shifts = $companyUser->shifts->map(function ($shift) {
+            ->map(function ($companyUser) use ($startDay, $endDay) {
+                $allDates = collect();
+                $currentDay = $startDay->copy();
+                while ($currentDay->lte($endDay)) {
+                    $allDates->push($currentDay->copy());
+                    $currentDay->addDay();
+                }
+
+                $existingShifts = $companyUser->shifts->keyBy(fn($shift) => $shift->shift_date->format('Y-m-d'));
+
+                $shifts = $allDates->map(function ($date) use ($existingShifts) {
+                    $dateKey = $date->format('Y-m-d');
+                    $shift = $existingShifts->get($dateKey);
+
                     return [
                         'id' => $shift?->id,
-                        'starts_at' => $shift->starts_at?->toIso8601String(),
-                        'ends_at' => $shift->ends_at?->toIso8601String(),
-                        'shift_date' => $shift?->shift_date?->toIso8601String(),
-                        'duration_in_minutes' => $shift->starts_at && $shift->ends_at
+                        'starts_at' => $shift?->starts_at?->toIso8601String(),
+                        'ends_at' => $shift?->ends_at?->toIso8601String(),
+                        'shift_date' => $shift?->shift_date?->toIso8601String() ?? $date->toIso8601String(),
+                        'duration_in_minutes' => $shift && $shift->starts_at && $shift->ends_at
                             ? $shift->ends_at->diffInMinutes($shift->starts_at)
                             : 0,
                     ];
                 });
 
-                $totalMinutes = $shifts->sum('duration_in_minutes');
-
                 return [
                     'user_id' => $companyUser->user->id,
                     'name' => $companyUser->user->name,
-                    'total_minutes' => $totalMinutes,
-                    'total_hours' => round($totalMinutes / 60, 2),
+                    'total_minutes' => $shifts->sum('duration_in_minutes'),
+                    'total_hours' => round($shifts->sum('duration_in_minutes') / 60, 2),
                     'shifts' => $shifts,
                 ];
             })
             ->toArray();
-    }
-
-    public function getShiftByCompanyUser(CompanyUser $companyUser, Carbon $startDay, Carbon $endDay)
-    {
-        return $companyUser->shifts()->where('company_user_id', $companyUser->id)
-            ->whereBetween('shift_date', [
-                $startDay->copy()->startOfDay(),
-                $endDay->copy()->endOfDay()
-            ])
-            ->first();
     }
 
     public function upsertShifts(array $shifts, Shift $shiftModel, Company $company): void
