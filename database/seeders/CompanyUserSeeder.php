@@ -26,7 +26,7 @@ class CompanyUserSeeder extends Seeder
             [
                 'owner_id' => $user->id,
                 'type' => 'Retail',
-                'phone' => '1234567890',
+                'phone_number' => '1234567890',
             ]
         );
 
