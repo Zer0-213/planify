@@ -26,7 +26,7 @@ class StaffController extends Controller
         ]);
     }
 
-    public function updateStaffMember(UpdateStaffRequest $request, int $staffId)
+    public function updateStaffMember(UpdateStaffRequest $request, int $staffId): RedirectResponse
     {
         $companyUser = auth()->user()->companyUsers()->first();
 

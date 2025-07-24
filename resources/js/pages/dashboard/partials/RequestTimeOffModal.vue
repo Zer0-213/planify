@@ -1,25 +1,45 @@
 <script lang="ts" setup>
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogTitle,
+    DialogTrigger
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PageProp } from '@/pages/dashboard/types/pageProps';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { format, parseISO } from 'date-fns';
 import { ref } from 'vue';
-
-const user = usePage<PageProp>().props.auth.user;
+import { toast } from 'vue-sonner';
 
 const form = useForm({
     start_date: format(new Date(), 'yyyy-MM-dd'),
-    start_time: '00:00',
     end_date: format(new Date(), 'yyyy-MM-dd'),
+    start_time: '00:00',
     end_time: '23:59',
 });
 
 const isFullDay = ref(true);
 
 const replaceDashes = (date: string) => format(parseISO(date), 'dd/MM/yyyy');
+
+const handleSubmit = () => {
+    form.post(route('time-off-requests.store'), {
+        onSuccess: () => {
+            form.reset();
+            isFullDay.value = true;
+            toast.success('Time off request submitted successfully');
+        },
+        onError: (error) => {
+            console.log(error);
+            toast.error(error.error);
+        },
+    });
+};
+
 </script>
 
 <template>
@@ -31,7 +51,7 @@ const replaceDashes = (date: string) => format(parseISO(date), 'dd/MM/yyyy');
             <DialogTitle>Request Time Off</DialogTitle>
             <DialogDescription>Submit a request for one or more days off</DialogDescription>
 
-            <form class="space-y-6" @submit.prevent="() => {}">
+            <form class="space-y-6" @submit.prevent="handleSubmit">
                 <!-- Full Day Checkbox -->
                 <div class="flex items-center gap-2">
                     <input id="full_day" v-model="isFullDay" class="accent-blue-600" type="checkbox" />

@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ShiftsController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StaffInviteController;
+use App\Http\Controllers\TimeOffRequestController;
 use App\Http\Middleware\UserHasCompany;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,6 +47,12 @@ Route::middleware(['auth', 'verified', UserHasCompany::class])->group(function (
         Route::delete('/destroy/{id}', 'deleteStaffMember')->name('staff.destroy');
         Route::put('/update/{id}', 'updateStaffMember')->name('staff.update');
     });
+
+    // TimeOffRequests
+    Route::controller(TimeOffRequestController::class)->prefix('time-off')->group(function () {
+        Route::post('/request', 'requestTimeOff')->name('time-off-requests.store');
+    });
+
 });
 
 

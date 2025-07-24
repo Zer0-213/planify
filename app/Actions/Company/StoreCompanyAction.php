@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
+// TODO: Turn this into a companyService
 class StoreCompanyAction
 {
     public function execute(array $validated): RedirectResponse
