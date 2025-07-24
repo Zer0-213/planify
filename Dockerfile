@@ -27,10 +27,10 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install and enable Xdebug
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install xdebug
 
-# Optional: Add basic Xdebug config
-COPY ./docker/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+# Only copy your custom Xdebug config; do NOT run docker-php-ext-enable here
+COPY ./docker/xdebug.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 
 # Install Composer (from official Composer image)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -39,7 +39,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # Install PHP dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN composer install --no-interaction --prefer-dist
 
 # Install Node.js dependencies
 RUN npm install
