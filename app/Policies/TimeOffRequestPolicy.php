@@ -41,7 +41,7 @@ class TimeOffRequestPolicy
     public function create(CompanyUser $companyUser): bool
     {
         // Everyone should be able to request time off
-        return true;
+        return $companyUser->hasPermission(PermissionEnum::MANAGE_TIME_OFF_REQUESTS);
     }
 
     /**
@@ -69,7 +69,7 @@ class TimeOffRequestPolicy
         }
 
         // Admins/managers can delete any time off request
-        return $companyUser->hasPermission(PermissionEnum::MANAGE_TIME_OFF_REQUESTS);
+        return $companyUser->hasPermission(PermissionEnum::REQUEST_TIME_OFF);
     }
 
     /**

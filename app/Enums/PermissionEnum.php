@@ -14,5 +14,6 @@ enum PermissionEnum: string
     case UPDATE_STAFF_MEMBER = 'update_staff_member';
     case VIEW_TIME_OFF_REQUESTS = 'view_time_off_requests';
     case MANAGE_TIME_OFF_REQUESTS = 'manage_time_off_requests';
+    case REQUEST_TIME_OFF = 'request_time_off';
 
 }

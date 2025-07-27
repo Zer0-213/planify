@@ -23,6 +23,11 @@ const mainNavItems: NavItem[] = [
         href: '/staff',
         icon: LayoutGrid,
     },
+    {
+        title: 'Time Off',
+        href: '/time-off',
+        icon: LayoutGrid,
+    },
 ];
 
 // May need this
