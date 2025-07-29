@@ -6,7 +6,6 @@ use App\Enums\PermissionEnum;
 use App\Http\Requests\StoreTimeOffRequest;
 use App\Services\TimeOffRequestService;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,7 +13,6 @@ use Inertia\Response;
 
 class TimeOffRequestController extends Controller
 {
-    use AuthorizesRequests;
 
     public function __construct(private readonly TimeOffRequestService $timeOffRequestService)
     {
@@ -28,7 +26,7 @@ class TimeOffRequestController extends Controller
 
         $companyTimeOffRequests = null;
         if ($companyUser->hasPermissionTo(PermissionEnum::MANAGE_TIME_OFF_REQUESTS)) {
-            $companyTimeOffRequests = $this->timeOffRequestService->getAllTimeOffRequestsByCompany($companyUser->companyId);
+            $companyTimeOffRequests = $this->timeOffRequestService->getAllTimeOffRequestsByCompany($companyUser->company->id);
         }
 
         return Inertia::render('timeOff/TimeOffMain', [
