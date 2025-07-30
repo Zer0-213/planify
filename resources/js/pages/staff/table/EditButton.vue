@@ -35,6 +35,7 @@ const user = usePage<{
 <template>
     <Dialog>
         <DialogTrigger class="cursor-pointer text-blue-500 underline"> Edit</DialogTrigger>
+
         <DialogContent>
             <DialogTitle>Edit</DialogTitle>
             <DialogDescription>Edit {{ staffName }}</DialogDescription>

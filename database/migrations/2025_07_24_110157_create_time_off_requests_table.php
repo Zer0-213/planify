@@ -18,7 +18,10 @@ return new class extends Migration {
             $table->date('end_date');
             $table->time('end_time')->nullable();
             $table->boolean('is_full_day')->default(true);
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
+            $table->enum('cancellation_status', ['none', 'requested', 'approved', 'rejected'])->default('none');
+            $table->foreignId('cancelled_by')->nullable()->constrained('company_users')->onDelete('set null');
+            $table->timestamp('cancelled_at')->nullable();
             $table->text('reason')->nullable();
             $table->text('admin_notes')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('company_users')->onDelete('set null');
