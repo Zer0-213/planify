@@ -49,6 +49,16 @@ const mainNavItems: NavItem[] = [
         href: '/shifts',
         icon: LayoutGrid,
     },
+    {
+        title: 'Staff',
+        href: '/staff',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Time Off',
+        href: '/time-off',
+        icon: LayoutGrid,
+    },
 ];
 
 const rightNavItems: NavItem[] = [
