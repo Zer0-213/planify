@@ -43,9 +43,10 @@ export const columns = [
                 id: row.original.id,
                 startDate: row.original.start_date,
                 endDate: row.original.end_date,
-                //startTime: info.row.original.start_time,
-                //endTime: info.row.original.end_time,
+                startTime: row.original.start_time || undefined,
+                endTime: row.original.end_time || undefined,
                 isFullDay: row.original.is_full_day || false,
+                currentStatus: row.original.status,
             }),
     }),
 ];

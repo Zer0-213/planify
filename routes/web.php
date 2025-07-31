@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified', UserHasCompany::class])->group(function (
     Route::controller(TimeOffRequestController::class)->prefix('time-off')->group(function () {
         Route::get('/', 'index')->name('time-off.index');
         Route::post('/request', 'requestTimeOff')->name('time-off-requests.store');
+        Route::put('/update/{id}', 'updateTimeOffRequest')->name('time-off-requests.update');
     });
 
 });
