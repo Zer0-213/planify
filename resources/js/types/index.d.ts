@@ -1,9 +1,11 @@
 import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
+import { PermissionEnum } from '@/enums/permissionEnum';
 
 export interface Auth {
     user: User;
+    permissions: PermissionEnum[];
 }
 
 export interface BreadcrumbItem {

@@ -26,15 +26,15 @@ class TimeOffRequestController extends Controller
         $userTimeOff = $this->timeOffRequestService->getAllTimeOffRequests($companyUser);
         $upcomingTimeOff = $this->timeOffRequestService->getApprovedUpcomingTimeOff($companyUser->company);
 
-        $companyTimeOffRequests = null;
+        $pendingRequests = null;
         if ($companyUser->hasPermissionTo(PermissionEnum::MANAGE_TIME_OFF_REQUESTS)) {
-            $companyTimeOffRequests = $this->timeOffRequestService->getPendingRequestsForApproval($companyUser);
+            $pendingRequests = $this->timeOffRequestService->getPendingRequestsForApproval($companyUser);
         }
 
         return Inertia::render('timeOff/TimeOffMain', [
             'userTimeOff' => $userTimeOff->toArray(),
             'upcomingTimeOff' => $upcomingTimeOff->toArray(),
-            'companyTimeOffRequests' => $companyTimeOffRequests?->toArray(),
+            'pendingRequests' => $pendingRequests?->toArray(),
         ]);
     }
 

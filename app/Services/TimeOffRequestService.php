@@ -21,7 +21,8 @@ class TimeOffRequestService
 
     public function getPendingRequestsForApproval(CompanyUser $viewer): Collection
     {
-        return TimeOffRequest::whereNot('company_user_id', $viewer->id)
+        return TimeOffRequest::with(['companyUser.user'])
+            ->whereNot('company_user_id', $viewer->id)
             ->where('status', 'pending')
             ->latest()
             ->get();

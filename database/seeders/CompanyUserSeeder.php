@@ -13,7 +13,7 @@ class CompanyUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::firstOrCreate(
+        $adminUser = User::firstOrCreate(
             ['email' => 'zeeshankhn123@outlook.com'],
             [
                 'name' => 'Zeeshan',
@@ -24,26 +24,68 @@ class CompanyUserSeeder extends Seeder
         $company = Company::firstOrCreate(
             ['name' => 'Test Company'],
             [
-                'owner_id' => $user->id,
+                'owner_id' => $adminUser->id,
                 'type' => 'Retail',
                 'phone_number' => '1234567890',
             ]
         );
 
-        /** @var $companyUser CompanyUser */
-        $companyUser = (new CompanyUser)->firstOrCreate(
+        $users = [
             [
+                'email' => 'manager@testcompany.com',
+                'name' => 'John Manager',
+                'role' => RoleEnum::MANAGER,
+            ],
+            [
+                'email' => 'staff1@testcompany.com',
+                'name' => 'Alice Staff',
+                'role' => RoleEnum::STAFF,
+            ],
+            [
+                'email' => 'staff2@testcompany.com',
+                'name' => 'Bob Staff',
+                'role' => RoleEnum::STAFF,
+            ],
+            [
+                'email' => 'staff3@testcompany.com',
+                'name' => 'Carol Staff',
+                'role' => RoleEnum::STAFF,
+            ],
+        ];
+
+        $adminCompanyUser = (new CompanyUser)->firstOrCreate([
+            'user_id' => $adminUser->id,
+            'company_id' => $company->id,
+        ]);
+
+        $this->assignRoleToCompanyUser($adminCompanyUser, RoleEnum::ADMIN);
+
+        foreach ($users as $userData) {
+            $user = User::firstOrCreate(
+                ['email' => $userData['email']],
+                [
+                    'name' => $userData['name'],
+                    'password' => bcrypt('password123'),
+                ]
+            );
+
+            $companyUser = (new CompanyUser)->firstOrCreate([
                 'user_id' => $user->id,
                 'company_id' => $company->id,
-            ]
-        );
+            ]);
 
-        $adminRole = Role::query()->where('name', RoleEnum::ADMIN)->first();
+            $this->assignRoleToCompanyUser($companyUser, $userData['role']);
+        }
+    }
 
-        if ($adminRole) {
-            $companyUser->roles()->sync([$adminRole->id]);
+    private function assignRoleToCompanyUser(CompanyUser $companyUser, RoleEnum $roleEnum): void
+    {
+        $role = Role::query()->where('name', $roleEnum->value)->first();
 
-            $permissionIds = $adminRole->permissions()->pluck('id');
+        if ($role) {
+            $companyUser->roles()->sync([$role->id]);
+
+            $permissionIds = $role->permissions()->pluck('id');
             $companyUser->permissions()->sync($permissionIds);
         }
     }

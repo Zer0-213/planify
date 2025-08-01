@@ -1,6 +1,6 @@
 import { TimeOffStatus } from '@/pages/timeOff/types/timeOffStatus';
 
-export type CompanyTimeOffRequest = {
+export type PendingTimeOffRequests = {
     id: number;
     company_user_id: number;
     start_date: string;
@@ -17,5 +17,11 @@ export type CompanyTimeOffRequest = {
     updated_at: string;
     company_user: {
         id: number;
+        user: {
+            id: number;
+            name: string;
+        };
     };
+    approve: string;
+    reject: string;
 };
