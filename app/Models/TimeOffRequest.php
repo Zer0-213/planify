@@ -29,6 +29,7 @@ class TimeOffRequest extends Model
         'admin_notes',
         'approved_by',
         'approved_at',
+
     ];
 
     /**

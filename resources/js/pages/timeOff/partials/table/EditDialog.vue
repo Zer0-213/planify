@@ -7,7 +7,7 @@ import { useDateTimeFormatting } from '@/pages/timeOff/hooks/useDateTimeFormatti
 import { TimeOffStatus } from '@/pages/timeOff/types/timeOffStatus';
 import { useForm } from '@inertiajs/vue3';
 import { format, parseISO } from 'date-fns';
-import { computed, defineProps, ref } from 'vue';
+import { computed, defineProps } from 'vue';
 import { toast } from 'vue-sonner';
 
 const props = defineProps<{
@@ -20,18 +20,16 @@ const props = defineProps<{
     currentStatus: TimeOffStatus;
 }>();
 
-const localTimeOff = ref({ ...props });
-
 const { formatTimeForInput, formatDateForInput } = useDateTimeFormatting();
 
 const form = useForm({
-    id: localTimeOff.value.id,
-    start_time: formatTimeForInput(localTimeOff.value.startTime),
-    end_time: formatTimeForInput(localTimeOff.value.endTime),
-    start_date: formatDateForInput(localTimeOff.value.startDate),
-    end_date: formatDateForInput(localTimeOff.value.endDate),
-    is_full_day: localTimeOff.value.isFullDay,
-    status: localTimeOff.value.currentStatus,
+    id: props.id,
+    start_time: formatTimeForInput(props.startTime),
+    end_time: formatTimeForInput(props.endTime),
+    start_date: formatDateForInput(props.startDate),
+    end_date: formatDateForInput(props.endDate),
+    is_full_day: props.isFullDay,
+    status: props.currentStatus,
 });
 
 const hasChanges = computed(() => {
@@ -40,7 +38,7 @@ const hasChanges = computed(() => {
         form.end_date !== formatDateForInput(props.endDate) ||
         form.start_time !== formatTimeForInput(props.startTime) ||
         form.end_time !== formatTimeForInput(props.endTime) ||
-        localTimeOff.value.isFullDay !== props.isFullDay ||
+        form.is_full_day !== props.isFullDay ||
         form.status !== props.currentStatus
     );
 });
@@ -48,13 +46,28 @@ const hasChanges = computed(() => {
 const replaceDashes = (date: string) => format(parseISO(date), 'dd/MM/yyyy');
 
 const handleSubmit = () => {
-    form.put(route('time-off-requests.update'), {
+    form.put(route('time-off-requests.update', props.id), {
         onSuccess: () => {
             toast.success('Time off request updated successfully');
         },
         onError: (error) => {
             console.log(error);
             toast.error('There was an error updating your time off request.');
+        },
+        onFinish: () => {
+            form.reset();
+        },
+    });
+};
+
+const deleteRequest = () => {
+    form.delete(route('time-off-requests.delete', props.id), {
+        onSuccess: () => {
+            toast.success('Time off request deleted successfully');
+        },
+        onError: (error) => {
+            console.log(error);
+            toast.error('There was an error deleting your time off request.');
         },
         onFinish: () => {
             form.reset();
@@ -74,7 +87,7 @@ const handleSubmit = () => {
             <form :form="form" class="space-y-6" @submit.prevent="handleSubmit">
                 <!-- Full Day Checkbox -->
                 <div class="flex items-center gap-2">
-                    <input id="full_day" v-model="localTimeOff.isFullDay" class="accent-blue-600" type="checkbox" />
+                    <input id="full_day" v-model="form.is_full_day" class="accent-blue-600" type="checkbox" />
                     <Label for="full_day">Full Day</Label>
                 </div>
 
@@ -83,10 +96,10 @@ const handleSubmit = () => {
                     <div class="flex items-center gap-3">
                         <Label for="start_date">Start Date</Label>
                         <Input id="start_date" v-model="form.start_date" type="date" />
-                        <Label v-if="!localTimeOff.isFullDay" for="start_time">Start Time</Label>
-                        <Input v-if="!localTimeOff.isFullDay" id="start_time" v-model="form.start_time" class="disabled:opacity-50" type="time" />
+                        <Label v-if="!form.is_full_day" for="start_time">Start Time</Label>
+                        <Input v-if="!form.is_full_day" id="start_time" v-model="form.start_time" class="disabled:opacity-50" type="time" />
                     </div>
-                    <p v-if="!localTimeOff.isFullDay" class="ml-1 text-sm text-gray-500">Start Time applies only to the first day.</p>
+                    <p v-if="!form.is_full_day" class="ml-1 text-sm text-gray-500">Start Time applies only to the first day.</p>
                 </div>
 
                 <!-- End Date and Time -->
@@ -94,26 +107,28 @@ const handleSubmit = () => {
                     <div class="flex items-center gap-3">
                         <Label for="end_date">End Date</Label>
                         <Input id="end_date" v-model="form.end_date" type="date" />
-                        <Label v-if="!localTimeOff.isFullDay" for="end_time">End Time</Label>
-                        <Input v-if="!localTimeOff.isFullDay" id="end_time" v-model="form.end_time" class="disabled:opacity-50" type="time" />
+                        <Label v-if="!form.is_full_day" for="end_time">End Time</Label>
+                        <Input v-if="!form.is_full_day" id="end_time" v-model="form.end_time" class="disabled:opacity-50" type="time" />
                     </div>
-                    <p v-if="!localTimeOff.isFullDay" class="ml-1 text-sm text-gray-500">End Time applies only to the last day.</p>
+                    <p v-if="!form.is_full_day" class="ml-1 text-sm text-gray-500">End Time applies only to the last day.</p>
                 </div>
 
                 <!-- Summary (Optional Display) -->
                 <div class="text-sm text-gray-600">
                     <span>You're requesting time off from </span>
                     <strong>{{ replaceDashes(form.start_date) }}</strong>
-                    <span v-if="!localTimeOff.isFullDay"> at {{ form.start_time }}</span>
+                    <span v-if="!form.is_full_day"> at {{ form.start_time }}</span>
                     <span> to </span>
                     <strong>{{ replaceDashes(form.end_date) }}</strong>
-                    <span v-if="!localTimeOff.isFullDay"> at {{ form.end_time }}</span
+                    <span v-if="!form.is_full_day"> at {{ form.end_time }}</span
                     >.
                 </div>
 
                 <DialogFooter class="justify-end, mt-4 flex flex-row gap-2">
                     <Button :disabled="!hasChanges" type="submit">Submit</Button>
-                    <Button variant="destructive">{{ currentStatus === 'pending' ? 'Delete' : 'Request cancellation' }} </Button>
+                    <Button type="button" variant="destructive" @click="deleteRequest">
+                        {{ currentStatus === 'pending' ? 'Delete' : 'Request cancellation' }}
+                    </Button>
                 </DialogFooter>
             </form>
         </DialogContent>

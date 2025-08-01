@@ -28,6 +28,7 @@ class StoreTimeOffRequest extends FormRequest
             'end_date' => 'required|date|after_or_equal:start_date',
             'end_time' => 'nullable|date_format:H:i',
             'reason' => 'nullable|string|max:500',
+            'is_full_day' => 'boolean',
         ];
     }
 
@@ -46,4 +47,22 @@ class StoreTimeOffRequest extends FormRequest
             'reason.max' => 'Reason cannot exceed 500 characters.',
         ];
     }
+
+    public function getTimeOffData(int $companyUserId, bool $includeStatus = false): array
+    {
+        $data = $this->only([
+            'start_date', 'start_time', 'end_date', 'end_time', 'is_full_day', 'reason'
+        ]);
+
+        $data['company_user_id'] = $companyUserId;
+        $data['is_full_day'] = $data['is_full_day'] ?? false;
+        $data['status'] = 'pending';
+
+        if ($includeStatus) {
+            $data['status'] = $this->input('status');
+        }
+
+        return $data;
+    }
+
 }

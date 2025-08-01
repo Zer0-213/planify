@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\PermissionEnum;
 use App\Http\Requests\StoreTimeOffRequest;
+use App\Models\TimeOffRequest;
 use App\Services\TimeOffRequestService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
@@ -23,15 +24,17 @@ class TimeOffRequestController extends Controller
     {
         $companyUser = $request->user()->companyUsers()->first();
         $userTimeOff = $this->timeOffRequestService->getAllTimeOffRequests($companyUser);
+        $upcomingTimeOff = $this->timeOffRequestService->getApprovedUpcomingTimeOff($companyUser->company);
 
         $companyTimeOffRequests = null;
         if ($companyUser->hasPermissionTo(PermissionEnum::MANAGE_TIME_OFF_REQUESTS)) {
-            $companyTimeOffRequests = $this->timeOffRequestService->getAllTimeOffRequestsByCompany($companyUser->company->id);
+            $companyTimeOffRequests = $this->timeOffRequestService->getPendingRequestsForApproval($companyUser);
         }
 
         return Inertia::render('timeOff/TimeOffMain', [
             'userTimeOff' => $userTimeOff->toArray(),
-            'companyTimeOffRequests' => $companyTimeOffRequests->toArray(),
+            'upcomingTimeOff' => $upcomingTimeOff->toArray(),
+            'companyTimeOffRequests' => $companyTimeOffRequests?->toArray(),
         ]);
     }
 
@@ -45,20 +48,41 @@ class TimeOffRequestController extends Controller
             throw new AuthorizationException('You do not have permission to request time off.');
         }
 
-        $isFullDay = !$request->filled('start_time') && !$request->filled('end_time');
-
-        $data = [
-            'company_user_id' => $companyUser->id,
-            'start_date' => $request->input('start_date'),
-            'start_time' => $request->input('start_time'),
-            'end_date' => $request->input('end_date'),
-            'end_time' => $request->input('end_time'),
-            'is_full_day' => $isFullDay,
-            'reason' => $request->input('reason'),
-        ];
+        $data = $request->getTimeOffData($companyUser->id);
 
         $this->timeOffRequestService->requestTimeOff($data);
 
         return redirect()->back()->with('success', 'Time off request submitted successfully.');
+    }
+
+    /**
+     * Updates a time off request
+     *
+     * @throws AuthorizationException
+     */
+    public function updateTimeOff(StoreTimeOffRequest $request, TimeOffRequest $timeOffRequest): RedirectResponse
+    {
+        $companyUser = $request->user()->companyUsers()->first();
+
+        if (!$companyUser->hasPermissionTo(PermissionEnum::MANAGE_TIME_OFF_REQUESTS)) {
+            throw new AuthorizationException('You do not have permission to manage time off requests.');
+        }
+
+        $data = $request->getTimeOffData($companyUser->id);
+
+        $this->timeOffRequestService->updateTimeOffRequest($data, $timeOffRequest);
+
+        return redirect()->route('time-off.index')->with('success', 'Time off request updated successfully.');
+    }
+
+    /**
+     * Delete a time off request
+     *
+     */
+    public function deleteTimeOff(Request $request, TimeOffRequest $timeOffRequest): RedirectResponse
+    {
+        $this->timeOffRequestService->deleteTimeOffRequest($timeOffRequest);
+
+        return redirect()->route('time-off.index')->with('success', 'Time off request deleted successfully.');
     }
 }
