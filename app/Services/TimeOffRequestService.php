@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Mail\SendTimeOffResponseMail;
 use App\Models\Company;
 use App\Models\CompanyUser;
 use App\Models\TimeOffRequest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Mail;
 
 class TimeOffRequestService
 {
@@ -45,9 +47,13 @@ class TimeOffRequestService
         TimeOffRequest::create($request);
     }
 
-    public function updateTimeOffRequest(array $request, TimeOffRequest $timeOffRequest): void
+    public function updateTimeOffRequest(array $data, TimeOffRequest $timeOffRequest, bool $sendEmail = false): void
     {
-        $timeOffRequest->update($request);
+        $timeOffRequest->update($data);
+
+        if ($sendEmail) {
+            Mail::to($timeOffRequest->companyUser->user->email)->queue(new SendTimeOffResponseMail($timeOffRequest));
+        }
     }
 
     public function deleteTimeOffRequest(TimeOffRequest $timeOffRequest): void

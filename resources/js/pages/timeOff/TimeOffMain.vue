@@ -26,9 +26,9 @@ defineProps<PageProps>();
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-y-4 p-6">
+        <div class="flex flex-col gap-y-10 p-6">
             <AppTable
-                v-if="hasManageRequestsPermissions"
+                v-if="hasManageRequestsPermissions && pendingRequests && pendingRequests?.length > 0"
                 :columns="pendingTimeOffColumns"
                 :data="pendingRequests || []"
                 table-title="Pending Time Off Requests"

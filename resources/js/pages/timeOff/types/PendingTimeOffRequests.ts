@@ -22,6 +22,5 @@ export type PendingTimeOffRequests = {
             name: string;
         };
     };
-    approve: string;
-    reject: string;
+    action?: string;
 };

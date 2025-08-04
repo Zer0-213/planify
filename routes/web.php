@@ -54,6 +54,7 @@ Route::middleware(['auth', 'verified', UserHasCompany::class])->group(function (
         Route::post('/request', 'requestTimeOff')->name('time-off-requests.store');
         Route::put('/update/{timeOffRequest}', 'updateTimeOff')->name('time-off-requests.update');
         Route::delete('/delete/{timeOffRequest}', 'deleteTimeOff')->name('time-off-requests.delete');
+        Route::patch('/respond/{timeOffRequest}', 'respondToTimeOff')->name('time-off-requests.respond');
     });
 
 });

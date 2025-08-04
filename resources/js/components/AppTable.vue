@@ -34,7 +34,7 @@ const emit = defineEmits<{
 
 <template>
     <div class="flex w-full flex-col gap-2">
-        <Label v-if="tableTitle" class="justify-center">{{ tableTitle }}</Label>
+        <Label v-if="tableTitle" class="justify-start">{{ tableTitle }}</Label>
         <div class="rounded-md border">
             <Table>
                 <TableHeader>

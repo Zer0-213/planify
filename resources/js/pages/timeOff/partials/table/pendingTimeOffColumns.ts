@@ -12,8 +12,8 @@ export const pendingTimeOffColumns = [
     columnHelper.accessor((row) => formatDateRange(row.start_date, row.end_date), { header: 'Dates' }),
     columnHelper.accessor((row) => format(row.created_at, 'dd/MM/yyyy'), { header: 'Requested At' }),
     columnHelper.accessor('reason', { header: 'Reason' }),
-    columnHelper.accessor('approve', {
+    columnHelper.accessor('action', {
         header: '',
-        cell: () => h(HandleRequestDialog),
+        cell: ({ row }) => h(HandleRequestDialog, row.original),
     }),
 ];
