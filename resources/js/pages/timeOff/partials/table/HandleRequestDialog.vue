@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Button } from '@/components/ui/button';
-import { PendingTimeOffRequests } from '@/pages/timeOff/types/PendingTimeOffRequests';
+import { PendingTimeOffRequests } from '@/pages/timeOff/types/pendingTimeOffRequests';
 import { router } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
 import { toast } from 'vue-sonner';

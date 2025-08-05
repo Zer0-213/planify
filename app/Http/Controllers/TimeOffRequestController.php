@@ -25,7 +25,6 @@ class TimeOffRequestController extends Controller
     {
         $companyUser = getCurrentCompanyUser($request);
 
-        $userTimeOff = $this->timeOffRequestService->getAllTimeOffRequests($companyUser);
         $upcomingTimeOff = $this->timeOffRequestService->getApprovedUpcomingTimeOff($companyUser->company);
 
         $pendingRequests = null;
@@ -34,7 +33,6 @@ class TimeOffRequestController extends Controller
         }
 
         return Inertia::render('timeOff/TimeOffMain', [
-            'userTimeOff' => $userTimeOff->toArray(),
             'upcomingTimeOff' => $upcomingTimeOff->toArray(),
             'pendingRequests' => $pendingRequests?->toArray(),
         ]);

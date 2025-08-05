@@ -1,5 +1,5 @@
 import HandleRequestDialog from '@/pages/timeOff/partials/table/HandleRequestDialog.vue';
-import { PendingTimeOffRequests } from '@/pages/timeOff/types/PendingTimeOffRequests';
+import { PendingTimeOffRequests } from '@/pages/timeOff/types/pendingTimeOffRequests';
 import { formatDateRange } from '@/pages/timeOff/utils/formatDateTimes';
 import { createColumnHelper } from '@tanstack/vue-table';
 import { format } from 'date-fns';

@@ -1,17 +1,18 @@
 <script lang="ts" setup>
-import AppTable from '@/components/AppTable.vue';
+import AppTable from '@/components/AppTable/AppTable.vue';
 import { PermissionEnum } from '@/enums/permissionEnum';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { currentUserTimeOffColumns } from '@/pages/timeOff/partials/table/currentUserTimeOffColumns';
 import { pendingTimeOffColumns } from '@/pages/timeOff/partials/table/pendingTimeOffColumns';
-import { PendingTimeOffRequests } from '@/pages/timeOff/types/PendingTimeOffRequests';
+import { PendingTimeOffRequests } from '@/pages/timeOff/types/pendingTimeOffRequests';
 import { UserTimeOffRequest } from '@/pages/timeOff/types/userTimeOffRequest';
 import { SharedData } from '@/types';
+import { Paginated } from '@/types/paginated';
 import { usePage } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
 
 type PageProps = {
-    userTimeOff: Array<UserTimeOffRequest>;
+    upcomingTimeOff: Paginated<UserTimeOffRequest>;
     pendingRequests: Array<PendingTimeOffRequests> | null;
 };
 
@@ -33,7 +34,7 @@ defineProps<PageProps>();
                 :data="pendingRequests || []"
                 table-title="Pending Time Off Requests"
             />
-            <AppTable :columns="currentUserTimeOffColumns" :data="userTimeOff" table-title="Your Time Off" />
+            <AppTable :columns="currentUserTimeOffColumns" :data="upcomingTimeOff" :enable-pagination="true" table-title="Your Time Off" />
         </div>
     </AppLayout>
 </template>

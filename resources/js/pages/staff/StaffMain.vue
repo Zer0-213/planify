@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import AppTable from '@/components/AppTable.vue';
+import AppTable from '@/components/AppTable/AppTable.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AddStaffDialog from '@/pages/staff/partials/AddStaffDialog.vue';
 import { createColumns } from '@/pages/staff/table/columns';
