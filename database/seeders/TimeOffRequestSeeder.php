@@ -6,9 +6,13 @@ use App\Models\CompanyUser;
 use App\Models\TimeOffRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Random\RandomException;
 
 class TimeOffRequestSeeder extends Seeder
 {
+    /**
+     * @throws RandomException
+     */
     public function run(): void
     {
         // Get all company users to create time off requests for
@@ -25,8 +29,14 @@ class TimeOffRequestSeeder extends Seeder
         }
     }
 
+    /**
+     * @throws RandomException
+     */
     private function createTimeOffRequests(CompanyUser $companyUser): void
     {
+        $randomDay = random_int(1, 30);
+        $randomDay2 = random_int(1, 30);
+
         $requests = [
             // Past approved request
             [
@@ -60,6 +70,15 @@ class TimeOffRequestSeeder extends Seeder
                 'is_full_day' => true,
                 'status' => 'pending',
                 'reason' => 'Personal leave',
+                'created_at' => Carbon::now()->subDay(),
+            ],
+            [
+                'company_user_id' => $companyUser->id,
+                'start_date' => Carbon::now()->addDays(min($randomDay, $randomDay2)),
+                'end_date' => Carbon::now()->addDays(max($randomDay, $randomDay2)),
+                'is_full_day' => true,
+                'status' => 'approved',
+                'reason' => 'Random',
                 'created_at' => Carbon::now()->subDay(),
             ],
             // Rejected request

@@ -38,8 +38,7 @@ class TimeOffRequestService
             ->where('end_date', '>=', now()->toDateString())
             ->orderBy('start_date')
             ->orderBy('start_time')
-            ->paginate(15);
-
+            ->paginate(30);
     }
 
     public function requestTimeOff(array $request): void
