@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useDateTimeFormatting } from '@/pages/timeOff/hooks/useDateTimeFormatting';
+import { useDateTimeFormatting } from '@/pages/timeOff/composables/useDateTimeFormatting';
 import { TimeOffStatus } from '@/pages/timeOff/types/timeOffStatus';
 import { useForm } from '@inertiajs/vue3';
 import { format, parseISO } from 'date-fns';

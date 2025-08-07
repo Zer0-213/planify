@@ -15,5 +15,11 @@ export type UserTimeOffRequest = {
     approved_at: string | null;
     created_at: string;
     updated_at: string;
+    company_user: {
+        user: {
+            id: number;
+            name: string;
+        };
+    };
     edit?: string | null;
 };

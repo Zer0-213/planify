@@ -30,15 +30,24 @@ class TimeOffRequestService
             ->get();
     }
 
-    public function getApprovedUpcomingTimeOff(Company $company): LengthAwarePaginator
+    public function getApprovedUpcomingTimeOff(Company $company, ?string $search = null): LengthAwarePaginator
     {
         return TimeOffRequest::with(['companyUser.user'])
             ->whereRelation('companyUser', 'company_id', $company->id)
             ->where('status', 'approved')
             ->where('end_date', '>=', now()->toDateString())
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('reason', 'like', "%{$search}%")
+                      ->orWhereHas('companyUser.user', function ($qq) use ($search) {
+                          $qq->where('name', 'like', "%{$search}%");
+                      });
+                });
+            })
             ->orderBy('start_date')
             ->orderBy('start_time')
-            ->paginate(30);
+            ->paginate(25)
+            ->withQueryString();
     }
 
     public function requestTimeOff(array $request): void

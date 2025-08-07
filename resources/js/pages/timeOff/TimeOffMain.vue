@@ -1,40 +1,67 @@
 <script lang="ts" setup>
+import AppPagination from '@/components/AppPagination.vue';
 import AppTable from '@/components/AppTable/AppTable.vue';
+import { Input } from '@/components/ui/input';
 import { PermissionEnum } from '@/enums/permissionEnum';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { currentUserTimeOffColumns } from '@/pages/timeOff/partials/table/currentUserTimeOffColumns';
+import { useTimeOffSearch } from '@/pages/timeOff/composables/useTimeOffSearch';
 import { pendingTimeOffColumns } from '@/pages/timeOff/partials/table/pendingTimeOffColumns';
+import { upComingTimeOffs } from '@/pages/timeOff/partials/table/upComingTimeOffs';
 import { PendingTimeOffRequests } from '@/pages/timeOff/types/pendingTimeOffRequests';
 import { UserTimeOffRequest } from '@/pages/timeOff/types/userTimeOffRequest';
 import { SharedData } from '@/types';
 import { Paginated } from '@/types/paginated';
 import { usePage } from '@inertiajs/vue3';
-import { defineProps } from 'vue';
+import { computed, defineProps } from 'vue';
 
-type PageProps = {
+interface PageProps {
     upcomingTimeOff: Paginated<UserTimeOffRequest>;
     pendingRequests: Array<PendingTimeOffRequests> | null;
-};
+    filters?: { q?: string };
+}
 
-const permissions = usePage<SharedData>().props?.auth.permissions;
+const props = defineProps<PageProps>();
 
-const hasManageRequestsPermissions = permissions?.includes(PermissionEnum.MANAGE_TIME_OFF_REQUESTS);
-
+const { auth } = usePage<SharedData>().props;
+const hasManageRequestsPermissions = computed(() => auth.permissions?.includes(PermissionEnum.MANAGE_TIME_OFF_REQUESTS));
 const breadcrumbs = [{ title: 'Staff', href: '/staff' }];
 
-defineProps<PageProps>();
+const { q, isClientFiltering, displayedPendingRequests, displayedUpcomingTimeOff, submitSearch } = useTimeOffSearch({
+    initialQuery: props.filters?.q ?? '',
+    currentFilters: props.filters,
+    upcomingTimeOff: props.upcomingTimeOff,
+    pendingRequests: props.pendingRequests,
+});
+
+const showPagination = computed(() => !isClientFiltering.value);
+const hasPendingRequests = computed(() => hasManageRequestsPermissions.value && displayedPendingRequests.value.length > 0);
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-y-10 p-6">
+        <div class="flex flex-col gap-y-6 p-6">
+            <div class="flex flex-wrap items-center gap-3">
+                <Input
+                    v-model="q"
+                    class="w-full max-w-md rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Search by name, reason, or status..."
+                    type="text"
+                    @keyup.enter="submitSearch"
+                />
+            </div>
+
             <AppTable
-                v-if="hasManageRequestsPermissions && pendingRequests && pendingRequests?.length > 0"
+                v-if="hasPendingRequests"
                 :columns="pendingTimeOffColumns"
-                :data="pendingRequests || []"
+                :data="displayedPendingRequests"
                 table-title="Pending Time Off Requests"
             />
-            <AppTable :columns="currentUserTimeOffColumns" :data="upcomingTimeOff" :enable-pagination="true" table-title="Your Time Off" />
+
+            <AppTable :columns="upComingTimeOffs" :data="displayedUpcomingTimeOff" table-title="Your Time Off" />
+
+            <div v-if="showPagination" class="flex flex-wrap items-center justify-center gap-2 py-4">
+                <AppPagination :paginated-data="upcomingTimeOff" />
+            </div>
         </div>
     </AppLayout>
 </template>

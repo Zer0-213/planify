@@ -15,7 +15,6 @@ class TimeOffRequestSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all company users to create time off requests for
         $companyUsers = CompanyUser::all();
 
         if ($companyUsers->isEmpty()) {
@@ -23,8 +22,9 @@ class TimeOffRequestSeeder extends Seeder
             return;
         }
 
+        TimeOffRequest::query()->delete();
+
         foreach ($companyUsers as $companyUser) {
-            // Create some sample time off requests for each company user
             $this->createTimeOffRequests($companyUser);
         }
     }
@@ -38,7 +38,6 @@ class TimeOffRequestSeeder extends Seeder
         $randomDay2 = random_int(1, 30);
 
         $requests = [
-            // Past approved request
             [
                 'company_user_id' => $companyUser->id,
                 'start_date' => Carbon::now()->subDays(30),
@@ -46,11 +45,10 @@ class TimeOffRequestSeeder extends Seeder
                 'is_full_day' => true,
                 'status' => 'approved',
                 'reason' => 'Family vacation',
-                'approved_by' => $companyUser->id, // Self-approved for demo
+                'approved_by' => $companyUser->id,
                 'approved_at' => Carbon::now()->subDays(25),
                 'created_at' => Carbon::now()->subDays(35),
             ],
-            // Pending half-day request
             [
                 'company_user_id' => $companyUser->id,
                 'start_date' => Carbon::now()->addDays(5),
@@ -62,7 +60,6 @@ class TimeOffRequestSeeder extends Seeder
                 'reason' => 'Medical appointment',
                 'created_at' => Carbon::now()->subDays(2),
             ],
-            // Future full day request
             [
                 'company_user_id' => $companyUser->id,
                 'start_date' => Carbon::now()->addDays(15),
@@ -81,7 +78,15 @@ class TimeOffRequestSeeder extends Seeder
                 'reason' => 'Random',
                 'created_at' => Carbon::now()->subDay(),
             ],
-            // Rejected request
+            [
+                'company_user_id' => $companyUser->id,
+                'start_date' => Carbon::now()->addDays(min($randomDay, $randomDay2)),
+                'end_date' => Carbon::now()->addDays(max($randomDay, $randomDay2)),
+                'is_full_day' => true,
+                'status' => 'approved',
+                'reason' => 'Random2',
+                'created_at' => Carbon::now()->subDay(),
+            ],
             [
                 'company_user_id' => $companyUser->id,
                 'start_date' => Carbon::now()->addDays(25),
@@ -90,11 +95,10 @@ class TimeOffRequestSeeder extends Seeder
                 'status' => 'rejected',
                 'reason' => 'Holiday request',
                 'admin_notes' => 'Too many people already off during this period',
-                'approved_by' => $companyUser->id, // Self-rejected for demo
+                'approved_by' => $companyUser->id,
                 'approved_at' => Carbon::now()->subHours(12),
                 'created_at' => Carbon::now()->subDays(3),
             ],
-            // Another pending request with specific times
             [
                 'company_user_id' => $companyUser->id,
                 'start_date' => Carbon::now()->addDays(10),

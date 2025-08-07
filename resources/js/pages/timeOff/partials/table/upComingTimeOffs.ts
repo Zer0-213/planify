@@ -7,7 +7,8 @@ import { h } from 'vue';
 
 const columnHelper = createColumnHelper<UserTimeOffRequest>();
 
-export const currentUserTimeOffColumns = [
+export const upComingTimeOffs = [
+    columnHelper.accessor('company_user.user.name', { header: 'Name' }),
     columnHelper.accessor((row) => formatDateRange(row.start_date, row.end_date), { header: 'Dates' }),
     columnHelper.accessor((row) => formatTimeRange(row.start_time, row.end_time), { header: 'Time' }),
     columnHelper.accessor((row) => format(row.created_at, 'dd/MM/yyyy'), { header: 'Requested At' }),
