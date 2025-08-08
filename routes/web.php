@@ -15,7 +15,7 @@ Route::get('/', static function () {
     return Inertia::render('Welcome');
 })->name('home');
 
-// Invite staff mnember
+// Invite staff member
 Route::controller(StaffInviteController::class)->group(function () {
     Route::get('/accept-invite', 'acceptInvite')->name('acceptInvite');
     Route::get('/register-invite', 'showInvitedUserForm')->name('showInvitedUserForm');
@@ -23,13 +23,16 @@ Route::controller(StaffInviteController::class)->group(function () {
     Route::post('staff/create-from-invite', 'createUserFromInvite')->name('staff.createUserFromInvite');
 });
 
-// Create company
+// Company onboarding/creation (for users without companies)
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('company/create', [CompanyController::class, 'create'])->name('company.create');
-    Route::post('company/store', [CompanyController::class, 'store'])->name('company.store');
+    Route::controller(CompanyController::class)->prefix('company')->group(function () {
+        Route::get('/', 'index')->name('company.index'); // Shows create form
+        Route::post('/', 'store')->name('company.store');
+        Route::get('/deleted-notice', 'showDeletedDialog')->name('company.deletedNotice');
+    });
 });
 
-// Most routes
+// Main application routes (for users with companies)
 Route::middleware(['auth', 'verified', UserHasCompany::class])->group(function () {
 
     // Dashboard
@@ -56,9 +59,7 @@ Route::middleware(['auth', 'verified', UserHasCompany::class])->group(function (
         Route::delete('/delete/{timeOffRequest}', 'deleteTimeOff')->name('time-off-requests.delete');
         Route::patch('/respond/{timeOffRequest}', 'respondToTimeOff')->name('time-off-requests.respond');
     });
-
 });
 
-
-require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
+require __DIR__ . '/settings.php';

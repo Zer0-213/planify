@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('time_off_requests', function (Blueprint $table) {
             $table->id();
+            $table->softDeletes();
             $table->foreignId('company_user_id')->constrained()->onDelete('cascade');
             $table->date('start_date');
             $table->time('start_time')->nullable();

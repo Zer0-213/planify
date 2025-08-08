@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Company\StoreCompanyAction;
+use App\Models\Company;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,6 +11,12 @@ use Inertia\Response;
 
 class CompanyController extends Controller
 {
+    public function index(): Response
+    {
+        return Inertia::render('company/Create');
+    }
+
+
     public function store(Request $request, StoreCompanyAction $action): RedirectResponse
     {
         $validated = $request->validate([
@@ -21,9 +28,13 @@ class CompanyController extends Controller
         return $action->execute($validated);
     }
 
-
-    public function create(): Response
+    public function showDeletedDialog()
     {
-        return Inertia::render('company/Create');
+        $companyUser = auth()->user()->companyUsers()->first();
+        $company = Company::withTrashed()->find($companyUser?->company_id);
+
+        return Inertia::render('company/DeletedNotice', [
+            'companyName' => $company?->name ?? 'Your company',
+        ]);
     }
 }

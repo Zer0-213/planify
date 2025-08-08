@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PermissionEnum;
 use Database\Factories\UserFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -20,7 +22,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -31,20 +33,20 @@ use Spatie\Permission\Models\Role;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Collection<int, \App\Models\Company> $companies
+ * @property-read Collection<int, Company> $companies
  * @property-read int|null $companies_count
- * @property-read Collection<int, \App\Models\CompanyInvite> $companyInvites
+ * @property-read Collection<int, CompanyInvite> $companyInvites
  * @property-read int|null $company_invites_count
- * @property-read Collection<int, \App\Models\CompanyUser> $companyUsers
+ * @property-read Collection<int, CompanyUser> $companyUsers
  * @property-read int|null $company_users_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read Role|null $roles
- * @property-read Collection<int, \App\Models\Shift> $shifts
+ * @property-read Collection<int, Shift> $shifts
  * @property-read int|null $shifts_count
- * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User query()
@@ -57,11 +59,11 @@ use Spatie\Permission\Models\Role;
  * @method static Builder<static>|User wherePhoneNumber($value)
  * @method static Builder<static>|User whereRememberToken($value)
  * @method static Builder<static>|User whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     // ─────────────────────────────────────
     // Mass Assignment & Serialization

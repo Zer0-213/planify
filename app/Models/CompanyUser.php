@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -52,8 +53,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class CompanyUser extends Model
 {
-    use HasFactory;
-    use HasRoles;
+    use HasFactory, HasRoles, SoftDeletes;
 
     protected $fillable = [
         'company_id',

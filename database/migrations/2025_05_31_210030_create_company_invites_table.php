@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('company_invites', static function (Blueprint $table) {
             $table->id();
+            $table->softDeletes();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->string('email')->unique();
             $table->string('phone_number')->nullable();

@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('company_users', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->softDeletes();
             $table->foreignId('company_id')->constrained()->onDelete('cascade'); // Reference to the company
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Reference to the user
         });

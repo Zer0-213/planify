@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PermissionEnum;
 use App\Http\Requests\Staff\DeleteStaffRequest;
 use App\Http\Requests\staff\UpdateStaffRequest;
 use App\Services\StaffService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,7 +32,9 @@ class StaffController extends Controller
     {
         $companyUser = auth()->user()->companyUsers()->first();
 
-        $request->authorize('update', [$companyUser]);
+        if (!$companyUser->hasPermission(PermissionEnum::UPDATE_STAFF_MEMBER)) {
+            throw new AuthorizationException('You do not have permission to update this staff member.');
+        }
 
         $this->staffService->updateStaffMember($staffId, $request->validated());
 
@@ -42,7 +46,9 @@ class StaffController extends Controller
     {
         $companyUser = auth()->user()->companyUsers()->first();
 
-        $request->authorize('delete', [$companyUser]);
+        if (!$companyUser->hasPermission(PermissionEnum::DELETE_STAFF_MEMBER)) {
+            throw new AuthorizationException('You do not have permission to delete this staff member.');
+        }
 
         $this->staffService->deleteStaffMember($staffId);
 

@@ -43,6 +43,8 @@ class SyncRolesAndPermissions extends Command
             PermissionEnum::DELETE_STAFF_MEMBER->value,
             PermissionEnum::UPDATE_STAFF_MEMBER->value,
             PermissionEnum::VIEW_TIME_OFF_REQUESTS->value,
+            PermissionEnum::DELETE_COMPANY->value,
+            PermissionEnum::DISABLE_COMPANY->value,
         ];
 
         $managerPermissions = [
