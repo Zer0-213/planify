@@ -24,7 +24,6 @@ const canCreateStaff = permissions.includes('create_user');
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-6">
-            <h1 class="mb-4 text-2xl font-bold">Staff List</h1>
             <section class="mt-6 w-full">
                 <AddStaffDialog v-if="canCreateStaff" :roles="roles" />
                 <AppTable

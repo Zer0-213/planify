@@ -39,14 +39,14 @@ class TimeOffRequestService
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('reason', 'like', "%{$search}%")
-                      ->orWhereHas('companyUser.user', function ($qq) use ($search) {
-                          $qq->where('name', 'like', "%{$search}%");
-                      });
+                        ->orWhereHas('companyUser.user', function ($qq) use ($search) {
+                            $qq->where('name', 'like', "%{$search}%");
+                        });
                 });
             })
             ->orderBy('start_date')
             ->orderBy('start_time')
-            ->paginate(25)
+            ->paginate(15)
             ->withQueryString();
     }
 

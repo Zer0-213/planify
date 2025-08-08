@@ -16,7 +16,8 @@ const handlePress = (action: 'approved' | 'rejected') => {
             status: action,
         },
         {
-            onSuccess: () => router.reload(),
+            onSuccess: () => router.get(route('time-off.index')),
+
             onError: (e) => {
                 console.error(e);
                 toast.error('Something went wrong');

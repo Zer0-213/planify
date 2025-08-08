@@ -14,11 +14,11 @@ import { Paginated } from '@/types/paginated';
 import { usePage } from '@inertiajs/vue3';
 import { computed, defineProps } from 'vue';
 
-interface PageProps {
+type PageProps = {
     upcomingTimeOff: Paginated<UserTimeOffRequest>;
     pendingRequests: Array<PendingTimeOffRequests> | null;
     filters?: { q?: string };
-}
+};
 
 const props = defineProps<PageProps>();
 
@@ -40,7 +40,7 @@ const hasPendingRequests = computed(() => hasManageRequestsPermissions.value && 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-col gap-y-6 p-6">
-            <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-wrap justify-end gap-3">
                 <Input
                     v-model="q"
                     class="w-full max-w-md rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -57,7 +57,7 @@ const hasPendingRequests = computed(() => hasManageRequestsPermissions.value && 
                 table-title="Pending Time Off Requests"
             />
 
-            <AppTable :columns="upComingTimeOffs" :data="displayedUpcomingTimeOff" table-title="Your Time Off" />
+            <AppTable :columns="upComingTimeOffs" :data="displayedUpcomingTimeOff" table-title="Who's Off" />
 
             <div v-if="showPagination" class="flex flex-wrap items-center justify-center gap-2 py-4">
                 <AppPagination :paginated-data="upcomingTimeOff" />
