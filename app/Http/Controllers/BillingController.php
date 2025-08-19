@@ -58,7 +58,6 @@ class BillingController extends Controller
         return view('billing', [
             'checkout' => $checkout,
         ]);
-
     }
 
 }

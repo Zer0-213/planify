@@ -8,9 +8,8 @@
     @paddleJS
 </head>
 
-<x-paddle-checkout :checkout="$checkout" class="w-full">
-
-</x-paddle-checkout>
-
+<div class="flex justify-center items-center h-screen">
+    <x-paddle-checkout :checkout="$checkout" class="w-full" />
+</div>
 </html>
 
