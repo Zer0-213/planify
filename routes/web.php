@@ -43,7 +43,10 @@ Route::middleware('auth')->middleware('verified')->group(function () {
     Route::prefix('billing')->controller(BillingController::class)->group(function () {
         Route::get('/notice', 'notice')->name('billing.notice');
         Route::get('/portal', 'portal')->name('billing.portal');
+        Route::get('/processing', 'processing')->name('billing.processing');
+        Route::get('/check-subscription', 'checkSubscription')->name('billing.checkSubscription');
     });
+
 
     // Routes for users who **belong to a company**
     Route::middleware(UserHasCompany::class)
