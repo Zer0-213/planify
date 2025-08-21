@@ -51,7 +51,7 @@ class BillingController extends Controller
                 : redirect()->route('dashboard');
         }
 
-        $checkout = $user->checkout('pri_01k2524wtmcmerd1pw691g0cpr')
+        $checkout = $user->subscribe('pri_01k2524wtmcmerd1pw691g0cpr')
             ->returnTo(route('billing.processing'));
 
         return view('billing', [
