@@ -1,106 +1,23 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { useSubscriptionProcessor } from '@/pages/billing/composables/useSubscriptionProcessor';
 
-const props = defineProps({
-    user: Object,
-    checkInterval: {
-        type: Number,
-        default: 3000,
+const props = defineProps<{
+    checkInterval: number;
+    maxWaitTime: number;
+}>();
+
+const { timedOut, progressWidth, continueToDashboard, elapsedTime, checkAgain } = useSubscriptionProcessor({
+    checkInterval: props.checkInterval,
+    maxWaitTime: props.maxWaitTime,
+    onSuccess: () => {
+        console.log('Subscription activated successfully!');
     },
-    maxWaitTime: {
-        type: Number,
-        default: 60000,
+    onTimeout: () => {
+        console.log('Subscription processing timed out');
     },
-});
-
-const elapsedTime = ref(0);
-const timedOut = ref(false);
-const interval = ref(0);
-const elapsedInterval = ref(0);
-
-const progressWidth = computed(() => {
-    return Math.min((elapsedTime.value / props.maxWaitTime) * 100, 100);
-});
-
-const checkSubscriptionStatus = async () => {
-    try {
-        const response = await fetch(route('billing.checkSubscription'), {
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        });
-
-        const data = await response.json();
-
-        if (data.subscribed) {
-            cleanup();
-            router.visit(route('dashboard'), {
-                onSuccess: () => {
-                    // Optional: Show success message
-                    // You can add a flash message here
-                },
-            });
-            return true;
-        }
-    } catch (error) {
-        console.error('Error checking subscription:', error);
-    }
-
-    return false;
-};
-
-const startChecking = () => {
-    // Check immediately
-    checkSubscriptionStatus();
-
-    // Set up regular checks
-    interval.value = setInterval(async () => {
-        if (await checkSubscriptionStatus()) {
-            return; // Subscription found, cleanup will be called
-        }
-
-        if (elapsedTime.value >= props.maxWaitTime) {
-            timedOut.value = true;
-            cleanup();
-        }
-    }, props.checkInterval);
-
-    // Track elapsed time
-    elapsedInterval.value = setInterval(() => {
-        elapsedTime.value += 100;
-    }, 100);
-};
-
-const cleanup = () => {
-    if (interval.value !== 0) {
-        clearInterval(interval.value);
-        interval.value = 0;
-    }
-    if (elapsedInterval.value !== 0) {
-        clearInterval(elapsedInterval.value);
-        elapsedInterval.value = 0;
-    }
-};
-
-const continueToDashboard = () => {
-    cleanup();
-    router.visit(route('dashboard'));
-};
-
-const checkAgain = () => {
-    timedOut.value = false;
-    elapsedTime.value = 0;
-    startChecking();
-};
-
-onMounted(() => {
-    startChecking();
-});
-
-onUnmounted(() => {
-    cleanup();
+    onError: (error) => {
+        console.error('Subscription processing error:', error);
+    },
 });
 </script>
 

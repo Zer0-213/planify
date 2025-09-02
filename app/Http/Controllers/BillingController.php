@@ -73,8 +73,7 @@ class BillingController extends Controller
         }
 
         return Inertia::render('billing/Processing', [
-            'user' => $user->load('subscriptions'),
-            'checkInterval' => 3000, // Check every 3 seconds
+            'checkInterval' => 10000, // Check every 3 seconds
             'maxWaitTime' => 60000,  // Give up after 1 minute
         ]);
     }
@@ -82,17 +81,27 @@ class BillingController extends Controller
     /**
      * API endpoint to check subscription status.
      */
+
     public function checkSubscription(Request $request)
     {
         $user = $request->user();
-        $subscription = $user->subscription();
+
+        $companyUser = $user->companyUsers()->where('is_default', true)->first();
+
+        if (!$companyUser || !$companyUser->company) {
+            return response()->json([
+                'subscribed' => false,
+                'subscription' => null,
+                'error' => 'No company found'
+            ]);
+        }
+
+        $owner = $companyUser->company->owner;
+
+        $subscribed = $owner->subscribed();
 
         return response()->json([
-            'subscribed' => $subscription && $subscription->active(),
-            'subscription' => $subscription ? [
-                'status' => $subscription->status,
-                'active' => $subscription->active(),
-            ] : null,
+            'subscribed' => $subscribed,
         ]);
     }
 }

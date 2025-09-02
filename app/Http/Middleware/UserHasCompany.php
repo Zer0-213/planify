@@ -13,7 +13,7 @@ class UserHasCompany
     {
         $user = $request->user();
 
-        $companyUser = $user->companyUsers()->first();
+        $companyUser = $user->companyUsers()->where('is_default', true)->first();
 
         if (!$companyUser) {
             return redirect()->route('company.index');
@@ -26,8 +26,10 @@ class UserHasCompany
         }
 
         if ($company->trashed()) {
-            return redirect()->route('company.deleted.notice');
+            return redirect()->route('company.deletedNotice');
         }
+
+        $request->attributes->set('companyUser', $companyUser);
 
         return $next($request);
     }

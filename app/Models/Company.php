@@ -62,7 +62,7 @@ class Company extends Model
      */
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'owner_id');
     }
 
     /**
@@ -77,11 +77,6 @@ class Company extends Model
     public function invites(): HasMany
     {
         return $this->hasMany(CompanyInvite::class);
-    }
-
-    public function companyUsersWithShifts(): HasMany
-    {
-        return $this->companyUsers()->with(['user', 'shifts']);
     }
 
     public function companyUsers(): HasMany
