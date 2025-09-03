@@ -42,4 +42,15 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Configure the factory to automatically create a subscription after user creation.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->subscriptions()->create(['type' => fake()->word, 'paddle_id' => fake()->uuid, 'status' => 'active']);
+        });
+    }
+
 }

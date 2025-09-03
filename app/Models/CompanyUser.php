@@ -58,6 +58,7 @@ class CompanyUser extends Model
     protected $fillable = [
         'company_id',
         'user_id',
+        'is_default',
     ];
 
     protected string $guard_name = 'web';

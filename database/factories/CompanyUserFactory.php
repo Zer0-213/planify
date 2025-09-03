@@ -19,9 +19,13 @@ class CompanyUserFactory extends Factory
      */
     public function definition(): array
     {
+        $user = User::factory()->create();
+        $user->subscriptions()->create(['type' => 'default', 'paddle_id' => 'default', 'status' => 'active']);
+        $company = Company::factory()->create(['owner_id' => $user->id]);
         return [
-            'company_id' => Company::factory(),
-            'user_id' => User::factory(),
+            'company_id' => $company->id,
+            'user_id' => $user->id,
+            'is_default' => true,
         ];
     }
 
@@ -36,7 +40,9 @@ class CompanyUserFactory extends Factory
     {
         return $this->afterMaking(function (CompanyUser $companyUser) {
             if (!$companyUser->user_id) {
-                $companyUser->user()->associate(User::factory()->create());
+                $user = User::factory()->create();
+                $user->subscriptions()->create(['type' => 'default', 'paddle_id' => 'default', 'status' => 'active']);
+                $companyUser->user()->associate($user);
             }
             if (!$companyUser->company_id) {
                 $companyUser->company()->associate(Company::factory()->create());

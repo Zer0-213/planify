@@ -3,31 +3,33 @@
 use App\Http\Controllers\Settings\CompanyController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Middleware\EnsureCompanyIsSubscribed;
 use App\Http\Middleware\UserHasCompany;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware('auth')->group(function () {
 
-    Route::middleware(['verified', UserHasCompany::class])->group(function () {
-        // Company settings routes
-        Route::get('settings/companies', [CompanyController::class, 'index'])->name('settings.companies.index');
-        Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
-        Route::patch('companies/{company}/disable', [CompanyController::class, 'disable'])->name('companies.disable');
+    Route::middleware(UserHasCompany::class)->middleware(EnsureCompanyIsSubscribed::class)
+        ->group(function () {
+            // Company settings routes
+            Route::get('settings/companies', [CompanyController::class, 'index'])->name('settings.companies.index');
+            Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+            Route::patch('companies/{company}/disable', [CompanyController::class, 'disable'])->name('companies.disable');
 
-        // Profile settings routes
-        Route::redirect('settings', '/settings/profile');
-        Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+            // Profile settings routes
+            Route::redirect('settings', '/settings/profile');
+            Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+            Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-        // Password settings routes
-        Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
-        Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
+            // Password settings routes
+            Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
+            Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
 
-        // Appearance settings routes
-        Route::get('settings/appearance', function () {
-            return Inertia::render('settings/Appearance');
-        })->name('appearance');
-    });
+            // Appearance settings routes
+            Route::get('settings/appearance', function () {
+                return Inertia::render('settings/Appearance');
+            })->name('appearance');
+        });
 });

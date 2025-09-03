@@ -30,7 +30,7 @@ Route::controller(StaffInviteController::class)->group(function () {
 // ----------
 // Authenticated Routes
 // ----------
-Route::middleware('auth')->middleware('verified')->group(function () {
+Route::middleware('auth')->group(function () {
 
     // Company onboarding (for users without a company)
     Route::prefix('company')->controller(CompanyController::class)->group(function () {

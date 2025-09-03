@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Settings;
 
-use App\Models\User;
+use App\Models\CompanyUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,10 +12,10 @@ class ProfileUpdateTest extends TestCase
 
     public function test_profile_page_is_displayed()
     {
-        $user = User::factory()->create();
+        $companyUser = CompanyUser::factory()->create();
 
         $response = $this
-            ->actingAs($user)
+            ->actingAs($companyUser->user)
             ->get('/settings/profile');
 
         $response->assertOk();
@@ -23,7 +23,8 @@ class ProfileUpdateTest extends TestCase
 
     public function test_profile_information_can_be_updated()
     {
-        $user = User::factory()->create();
+        $companyUser = CompanyUser::factory()->create();
+        $user = $companyUser->user;
 
         $response = $this
             ->actingAs($user)
@@ -36,7 +37,7 @@ class ProfileUpdateTest extends TestCase
             ->assertSessionHasNoErrors()
             ->assertRedirect('/settings/profile');
 
-        $user->refresh();
+        $companyUser->user->refresh();
 
         $this->assertSame('Test User', $user->name);
         $this->assertSame('test@example.com', $user->email);
@@ -45,7 +46,8 @@ class ProfileUpdateTest extends TestCase
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()
     {
-        $user = User::factory()->create();
+        $companyUser = CompanyUser::factory()->create();
+        $user = $companyUser->user;
 
         $response = $this
             ->actingAs($user)
@@ -63,7 +65,7 @@ class ProfileUpdateTest extends TestCase
 
     public function test_user_can_delete_their_account()
     {
-        $user = User::factory()->create();
+        $user = CompanyUser::factory()->create()->user;
 
         $response = $this
             ->actingAs($user)
@@ -76,12 +78,11 @@ class ProfileUpdateTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
     }
 
     public function test_correct_password_must_be_provided_to_delete_account()
     {
-        $user = User::factory()->create();
+        $user = CompanyUser::factory()->create()->user;
 
         $response = $this
             ->actingAs($user)

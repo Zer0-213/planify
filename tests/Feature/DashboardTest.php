@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Company;
+use App\Models\CompanyUser;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,12 +21,21 @@ class DashboardTest extends TestCase
     public function test_authenticated_users_can_visit_the_dashboard()
     {
         $user = User::factory()->create();
+        $user->subscriptions()->create(['type' => 'default', 'paddle_id' => '1234567890', 'status' => 'active']);
+
         $company = Company::factory()->create(['owner_id' => $user->id]);
-        $company->companyUsers()->create(['user_id' => $user->id]);
+
+        CompanyUser::factory()->create([
+            'user_id' => $user->id,
+            'company_id' => $company->id,
+            'is_default' => true,
+        ]);
+
 
         $this->actingAs($user);
 
         $response = $this->get('/dashboard');
         $response->assertStatus(200);
     }
+
 }
